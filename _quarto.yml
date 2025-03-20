@@ -1,0 +1,27 @@
+project:
+  type: website
+  output-dir: docs
+website:
+  title: "REDEC"
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+      - href: Layers.qmd
+        text: "Cartography"
+    right: 
+      - icon: github # add icons as navbar buttons
+        href: https://github.com/worldregio/SMA
+        target: _blank
+  page-footer:
+    background: dark
+    left: Copyright 2025, Claude Grasland
+format:
+  html:
+    theme: 
+      light: minty    
+      dark: solar
+    css: styles.css
+    toc: true
+
+

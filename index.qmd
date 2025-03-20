@@ -1,0 +1,11 @@
+---
+title: "REDEC"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+---
+
+
+This github directory is used for cartographic experiments in relation with the REDEC project.
+

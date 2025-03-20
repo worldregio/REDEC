@@ -1,0 +1,275 @@
+---
+title: "Cartographic sources for the analysis of Val-de-Marne (94)"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+```
+
+
+
+
+## Objective
+
+The aim of this note is to examine the different statistical and cartographical sources of interest for the objectives of the REDEC project. We have chosen the *département* of Val-de-Marne as example because of this exceptional complexity in terms of contradictions between the different geographical divisions that should be used in the analysis
+
+
+## CIRCONSCRIPTIONS & CANTON
+
+
+The most fundamental units for the project are *cantons* and *cicronscription*. In the case of urbanised area like Val-de-Marne,it is not possible to build cirnconscription without breaking some cantons. But what is the level of discrepancy between the two divisions ?
+
+```{r}
+circ<-readRDS("data94/circ94.RDS") %>% st_transform(2154)
+cant<-readRDS("data94/cant94.RDS")  %>% st_transform(2154)
+com<-readRDS("data94/com94.RDS")  %>% st_transform(2154)
+iris<-readRDS("data94/iris94.RDS")  %>% st_transform(2154)
+grid<-readRDS("data94/grid94.RDS")  %>% st_transform(2154)
+```
+
+
+### 11 electoral circonscriptions
+
+```{r}
+mf_map(circ, type="typo", var="circ_code", leg_pos = NA)
+mf_label(circ, var="circ_code",cex = 1.2,halo = T)
+mf_layout("The 11 electoral circonscription of the département Val-de-Marne",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+
+### 25 cantons
+
+```{r}
+mf_map(cant, type="typo", var="can_id",leg_pos = NA)
+mf_label(cant, var="can_id",cex = 1,halo = T)
+mf_layout("The 25 cantons of the département of Val-de-Marne",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+## What about the rules ?
+
+The elaboration of 11 circonscription with 25 cantons as building block should normally be feasible by simple agregation with a minimum of cases of fragmentation of cantons. But it is not at all what is observed in the département of Val-de-Marne. 
+
+```{r}
+mf_map(circ, 
+       type="typo",
+       var="circ_code",
+       leg_pos = NA, 
+       border="white", 
+       lwd=2)
+mf_map(cant, type="base", col=NA, border="black", lwd=2, add=T)
+mf_label(circ, var="circ_code",cex = 1.2,halo = T)
+mf_layout("Differences between the limits of cantons and circonscriptions",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+- **Comment** : Looking at the map it seems clear that we are very far from the rules suggested by the law which was to avoid divisions of cantons when it is not necessary for equilibrium of population. The most obvious examples are the circonscription n°1 and n°2 that are mostly or exclusively made of pieces of cantons.
+
+
+## THE CRUCIAL LEVEL OF COMMUNES
+
+In the french electoral system, the *communes* are a crucial scale of governance below the level of departement (electtion by *cantons*), the region (election by *département*) and the national assembly (election by *circonscription*). It is therefore not possible to understand the logic observe at the levels of cantons and circonscription without looking at the interactions with the level of commune. **The differents scales of the electoral system are strongly interlinked**. 
+
+### Crossing cantons and communes
+
+In many cases, the delineation of cantons has divided the most populated communes in subparts. Was it always justified ? And what was the political resason of such subdivisions ?
+
+```{r}
+mf_map(com, 
+       type="typo",
+       var="com_code",
+       leg_pos = NA, 
+       border="white", 
+       lwd=1)
+mf_map(cant, type="base", col=NA, border="black", lwd=2, add=T)
+mf_label(com, var="com_code",cex = 0.5,halo = T,overlap = F)
+mf_layout("Differences between the limits of cantons and communes",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+
+- **Comment** : The map reveals many cases of division of communes between two cantons. This situations appears generally justified by the size of the most populated communes like Vitry-sur-Seine (94081), Créteil (94028), Champigny-sur-Marne. But it is more questionnable in the case of smaller communes like Villeneuvve-Saint-Georges (94078) or Vincennes (94080). We can suspect that some of the fragmentations of communes has been designed in order to favour the victory of one political party in some cantons. 
+
+### Crossing circonscriptions and communes
+
+Admitting that it was necessary to divide some communes at the level of cantons, wasn't it possible to proceed to their reunification at the level of circonscription ? It should normally be possible but it is not always the case as we can see on the map below. 
+
+```{r}
+mf_map(com, 
+       type="typo",
+       var="com_code",
+       leg_pos = NA, 
+       border="white", 
+       lwd=1)
+mf_map(circ, type="base", col=NA, border="black", lwd=2, add=T)
+mf_label(com, var="com_code",cex = 0.5,halo = T,overlap = F)
+mf_layout("Differences between the limits of circonscriptions and communes",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+- ***Comment*** : Some communal divisions at cantonal level has been removed at the level of circonsciption like in the case of Saint-Maur-des-Fossés (94068) or Vincennes (94080). But in other cases the divisions of communes has been maintained and eventually complexified by the apparition of new divisions of communes that do not follow the one introduced by canton. It is particularly the case for Créteil (94028), Vitry-sur-Seine (94081) and Champigny-sur-Marne (94017). This strange result is without any doubt a case of gerrymandering and it is certainly not by chance if the commmunes that has been subject to the most contradictory divisions belong to the same political orientation (left) when reunified communes be;long to the other political orientation (right).
+
+
+## INFRA-COMMUNAL DATA : IRIS AND VOTATION OFFICE
+
+The evaluation of political strategies that has been used by the author of territorial delineation of cantons and circonscription can not be clarified by data collected at communal level in the urbanized area. To analyze social homogeneity of population in terms of social and economic characteristics or political orientations, we need informations at a lower scale. But the great problem for this task is the fact that socio-economic data and political data are not available on the same territorial mesh.
+
+### Socio-econcomic data by IRIS
+
+Since many years, the french census offers extraordinary precise data at the level of IRIS which are spatial blocks of population with a minimum of approximatively 2000 inhabitants. Such data covers all aspect of social and ecomic life and are associated to many tables available on the website of INSEE. And they can even be related to individual databases where the location of household and people can be precisely associated to the IRIS. It is therefore very simple to analyze the internal social characteristics of circonscription and produce related maps. 
+
+### Electoral data by votation office
+
+The votation office are places where citizens are going to make their votations. It is generally a primary school or another municipal infrastructure that play the role of office. The size is a bit smaller than IRIS (approx. 1000 citizens per office). The main problem is that the precise geography of votation office is difficult to represent on a map because it is a list of streets and adresses and not a polygon with borders. Many researchers has tried to indentify theses limits and to cross the area of votation office with the IRIS in order to compare socio-economic data and electoral choices. But it remains difficult and subject to approximations. It is nevertheless of very high interest as we can demonstate by two simple examples.
+
+### Gerymandering 1 : don't waste your voices anwd win with 52-55%
+
+```{r}
+seliris <- iris %>% filter(circ_code==1) 
+
+par(mfrow=c(1,2))
+
+seliris$pop<-seliris$pct_csp_ouvrier+seliris$pct_csp_employe
+## Map 1
+mf_map(seliris, 
+       type="choro",
+       var="pop",
+       pal="Reds",
+       border="white", 
+         breaks=c(5, 15, 25, 35, 100),
+       leg_title = "%",
+       leg_val_rnd = 0,
+       lwd=0.5)
+mf_map(circ, type="base", col=NA, border="black", lwd=2, add=T)
+mf_map(com, type="base", col=NA, border="black", lwd=1, add=T)
+
+mf_label(com, var="com_name",cex = 0.5,halo = T,overlap = F)
+mf_layout("% of ouvriers & employés (low-middle class)",
+          frame=T, scale=T, arrow=F, credits= "Source : INSEE, Population census 2021")
+
+seliris$right<-seliris$score_LREM+seliris$score_LR
+## Map 2
+mf_map(seliris, 
+       type="choro",
+       var="right",
+       pal="Blues",
+       border="white", 
+       breaks=c(5, 15, 25, 35, 100),
+       leg_title = "%",
+       leg_val_rnd = 0,
+       lwd=0.5)
+mf_map(circ, type="base", col=NA, border="black", lwd=2, add=T)
+mf_map(com, type="base", col=NA, border="black", lwd=1, add=T)
+
+mf_label(com, var="com_name",cex = 0.5,halo = T,overlap = F)
+mf_layout("% of vote for LR & LREM (right-wing party)",
+          frame=T, scale=T, arrow=F, credits= "Source : Results of european electoon 2024")
+
+
+```
+
+- **Comment** : despite some missing values the two maps clearly help to understand the political strategy of the author of the delineation of the 1st Circonscription of val de Marne. One the one hand, we have the populated and rich commune of Saint-Maur-des-Fossés where the victory of the right-wing political party is obvious (generally with 60 to 70% of vote). On the other hand, we have neighboring communes or pieces of communes where left-wing party are the winners with a large majority. The strategy will be therefore to mix a small proportion of this left-wing area to the right-wing commune of Saint-Maur-des-Fossés in order to keep the majority (with approx. 55%) and limit the election of a left-wing deputy in other circonscriptions.
+
+
+### Gerrymandering 2 : waste the voices of your opponent and let them win with 70-80%
+
+
+```{r}
+seliris <- iris %>% filter(circ_code==2) 
+
+par(mfrow=c(1,2))
+
+seliris$pop<-seliris$pct_csp_ouvrier+seliris$pct_csp_employe
+## Map 1
+mf_map(seliris, 
+       type="choro",
+       var="pop",
+       pal="Reds",
+       border="white", 
+         breaks=c(5, 15, 25, 35, 100),
+       leg_title = "%",
+       leg_val_rnd = 0,
+       lwd=0.5)
+mf_map(circ, type="base", col=NA, border="black", lwd=2, add=T)
+mf_map(com, type="base", col=NA, border="black", lwd=1, add=T)
+
+mf_label(com, var="com_name",cex = 0.5,halo = T,overlap = F)
+mf_layout("% of ouvriers & employés (low-middle class)",
+          frame=T, scale=T, arrow=F, credits= "Source : INSEE, Population census 2021")
+
+seliris$right<-seliris$score_LREM+seliris$score_LR
+## Map 2
+mf_map(seliris, 
+       type="choro",
+       var="right",
+       pal="Blues",
+       border="white", 
+       breaks=c(5, 15, 25, 35, 100),
+       leg_title = "%",
+       leg_val_rnd = 0,
+       lwd=0.5)
+mf_map(circ, type="base", col=NA, border="black", lwd=2, add=T)
+mf_map(com, type="base", col=NA, border="black", lwd=1, add=T)
+
+mf_label(com, var="com_name",cex = 0.5,halo = T,overlap = F)
+mf_layout("% of vote for LR & LREM (right-wing party)",
+          frame=T, scale=T, arrow=F, credits= "Source : Results of european electoon 2024")
+
+
+```
+
+- ***Comment :*** The very strange form of the second circonscription of the Val-de-Marne illustrate the second strategy of gerrymandering which is to concentrate the voices of the opponent party in a limited number of circonscription. The "salamander" form of the circonscription was necessary to put together areas where blue collar and middle class are concentrated and where the right-wing party had no chance to win. Putting tohether the communes of Orly, Thiais and part of Créteil was a very efficient way to waste the voices of the left-wing party ...
+
+
+
+## GRID DATA AND TRASPORTATION NETWORKS
+
+The evaluation of the geometric properties of territorial divisions in terms of compacity or accessibility could be analyzed with the infra-communal data at IRIS level. But the best solution is to used the grid data provided by INSEE at the level of 1km or even 200m. These grid data extract from the census provide information not only on population but also on age, social categories and even income of inhabitants. It can be aggregated at upper level and could to some extent help to solve the problems of correspondance between IRIS and votation offices. These grid data can bu used for geometric measure based on euclideand distance. But they can also be combined with accessibility data by road or public transportation for more precise analysis if needed. 
+
+Lets just take an example with another circonscription of the Val-de-Marne localized in the outer periphery with a large superficy
+
+### Static map
+
+A static map is a projection in euclidean space making possible to compute easily geometric parameter (gravity center, ellipsoid, potential, etc.). 
+
+```{r}
+selcirc<- circ %>% filter(circ_code==3)
+selgrid<- st_intersection(grid,selcirc) %>% st_centroid()
+selgrid$pop<-selgrid$Ind - selgrid$Ind_0_3 - selgrid$Ind_4_5 -selgrid$Ind_6_10 - selgrid$Ind_11_17
+mf_map(selcirc, type="base", col="lightyellow")
+mf_map(com, type="base", col=NA, border="gray", add=T)
+mf_map(selgrid, type="prop", var="pop", add=T, inches=0.06, leg_pos = "topright", leg_title = "nb. d'individus de 18 ans et +")
+mf_layout(title = "Distribution de la population de 18 ans et + dans la 3e circonscription du Val de Marne",
+          frame=T, arrow=T, scale=T, credits = "Source : INSEE : gridded population data, census 2022")
+
+```
+
+### Dynamic map
+
+A dynamic map is a non projected map that can be combien with tiles making more easy to analyze the distributions of population in relation with topographic information, network, etc...
+
+```{r}
+
+leaflet() %>% addTiles() %>% addPolygons(data=st_transform(selcirc, 4326),
+                                         fillOpacity = 0.2,
+                                         fillColor = "lightyellow") %>%
+               addCircleMarkers(data=st_transform(selgrid, 4326),
+                                radius = 8*sqrt(selgrid$pop/900),
+                                fillColor = "red",
+                                fillOpacity = 0.8,
+                                label = selgrid$pop,
+                                stroke=F
+                                  )
+```
+
