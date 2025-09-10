@@ -1,0 +1,245 @@
+---
+title: "Classification with population size and euclidean distance constraints"
+subtitle: "Experiments on Val-de-Marne"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+library(knitr)
+library(anticlust)
+```
+
+
+
+
+## Objective
+
+The aim of this note is to experiment methods of classification with population and euclidean distance constraint. They don not fulfill necessarily the contiguity constraint but offers some interesting results for discussion
+
+
+```{r}
+circ<-readRDS("data94/circ94.RDS") %>% st_transform(2154)
+#cant<-readRDS("data94/cant94.RDS")  %>% st_transform(2154)
+com<-readRDS("data94/com94.RDS")  %>% st_transform(2154)
+iris<-readRDS("data94/iris94.RDS")  %>% st_transform(2154)
+#grid<-readRDS("data94/grid94.RDS")  %>% st_transform(2154)
+```
+
+
+## The 11 electoral circonscriptions
+
+We remind the spatial organisation of the 11 electoral circonscriptions of the Val de Marne that has been described in the previous analysis
+
+```{r}
+mf_map(circ, type="typo", var="circ_code", leg_pos = NA)
+mf_label(circ, var="circ_code",cex = 1.2,halo = T)
+mf_layout("The 11 electoral circonscription of the département Val-de-Marne",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+## Exepected size of circonscription
+
+Using the number of *inscrits* as criterium, we can see that the average size of circonscription should be :
+
+```{r}
+tot <- sum(iris$inscrits, na.rm=T)
+paste("Number of inscrits : " ,tot)
+paste("Number of circonscriptions : 11")
+paste("Ideal size : ", round(tot/11))
+paste("Margin with + or - 10% : [",round(0.9*tot/11),";",round(1.1*tot/11),"]")
+```
+
+
+## Communes as building blocks : not impossible but ...
+
+Can we use the commune as building blocks ?
+
+```{r}
+tabcom <- iris %>% st_drop_geometry() %>% 
+                group_by(com_name) %>% 
+               summarise(inscrits = sum(inscrits, na.rm=T)) %>% 
+              arrange(-inscrits)
+head(tabcom)
+```
+
+At first glance, it seems to be possible because none of the commune has a number of inscrits higher than the upper limit of size. But it will be practically difficult because it is not necessary possible to complete a big commune by a smaller one in every case. Just look at the map.
+
+```{r}
+x <- left_join(com, tabcom)
+mf_map(x, type = "base", col="lightyellow")
+mf_map(x, type = "prop", var="inscrits", inches = 0.3, col= "red")
+mf_label(x,var = "inscrits",halo = T)
+mf_layout("Nombre d'inscrits par commune",credits = "ANR-REDEC",
+          scale = T, arrow=F, frame=T)
+```
+
+
+## IRIS as building blocks
+
+The IRIS which are part of communes used by the INSEE for census are certainly a better choice. If we except some specific IRIS associated to industrial area, forest, etc, the divisions are generally characterized by relative proximity in terms of population and number of households. They are also relatively homogeneous in terms of housing and social characteristics. Last but not least, they are associated to a very large number of informations and can be, somehow, intersected with electoral data. 
+
+```{r}
+ggplot(iris, aes(x=inscrits)) + geom_histogram() + ggtitle("Number of inscrits by IRIS in Val-de-Marne in 2020")
+```
+
+The fact that the distribution presented here is bimodal can be explained by the fact that the number of inscrits has been derived from the intersection between vote office and IRIS and is not perfectly accurate. But we could use more exact data by using information from census based on age and nationality.  
+
+What is important for our example is the fact that IRIS are sufficiently small to make possible solutions for the delineation of circonscription that can more easily met the expectation than communes. 
+
+```{r}
+
+mf_map(iris, type = "base", col="lightyellow")
+mf_map(iris, type = "prop", var="inscrits", inches = 0.1, col= "red")
+mf_layout("Nombre d'inscrits par IRIS",credits = "ANR-REDEC",
+          scale = T, arrow=F, frame=T)
+
+```
+
+
+## Equalizing size by duplication of IRIS
+
+We propose to transform the distribution of IRIS in order to obtain approximatively equal size units comprise between 250 and 750. For example an IRIS with a size of 800 will be transform in two IRIS of size 400. An IRIS of size 1800 in three IRISof sise 600, etc...
+
+```{r}
+coo<-st_coordinates(st_centroid(iris))
+tab<-st_drop_geometry(iris) %>% select(iris_code, inscrits) %>%
+        cbind(coo) %>% filter(inscrits >0) %>% arrange(iris_code) %>%
+        mutate(nb = round(inscrits/500,0),
+                          size = inscrits/nb)
+tab2 <- tab[1,]
+
+k<-dim(tab)[1]
+
+for (i in 1:k) {
+  for (j in 1:tab$nb[i]){
+      tab2<-rbind(tab2, tab[i,])
+    }
+}
+tab2 <-tab2[-1,]
+
+```
+
+On obtient ainsi une distribution en unité de taille beaucoup plus voisines qu'avec les IRIS ce qui va permettre de simplifier les analyses ultérieures. 
+
+```{r}
+ggplot(tab2, aes(x=size)) + geom_histogram() + ggtitle("Number of inscrits by building block in Val-de-Marne in 2020")
+```
+
+
+## Localization in euclidian space
+
+The idea is to project or units with approximate equal size in an euclidean space in order to benefit from some interesting properties and to use existing algorithm of classification.
+
+
+```{r}
+ggplot(tab2, aes(x=X, y=Y,size=size) )+ 
+              geom_point(col="red", alpha=0.4) + 
+              coord_fixed(ratio = 1)  +
+        ggtitle("Euclidean projection of inscrits in euclidean space") + theme_light()
+```
+
+## K-means without constraint
+
+It is now possible to use classification methods based on the euclidean distance like k-means without constraint and examine the results of clustering for 11 circonscriptions
+
+
+```{r}
+coo<-as.matrix(cbind(tab2$X,tab2$Y))
+cl1 <- kmeans(x = coo, center=11)
+tab2$CIRC<-as.factor(cl1$cluster)
+
+ggplot(tab2, aes(x=X, y=Y,size=size, col=CIRC) )+ 
+              geom_point(alpha=0.4) + 
+              coord_fixed(ratio = 1)  +
+        ggtitle("K-means classification without constraints") + theme_light()
+```
+
+As we can see, the introduction of euclidean distance has produced cluster that fulfill generally the condition of contiguity despite the fact that it was not introduced directly. But looking in more details, we can see that the circonscription n° 9 is in fact splitted in two subgroups divided by the *Bois de Vincennes*. 
+
+But the main issue with this first approach is the fact that the units does not fulffil the condition of equal number of building blocks and equal size in terms of inscrits.
+
+```{r}
+anaclus <- tab2 %>% group_by(CIRC) %>% summarise(nbunit = n(), nbinscrits = round(sum(size))) %>% mutate(index = round(100*nbinscrits/mean(nbinscrits),1)) %>% arrange(nbinscrits)
+  
+kable(anaclus)
+```
+
+La taille des circonscriptions varie de 36730 à 98416 inscrits ce qui est largement en dehors des limites que nous nous sommes fixés. 
+
+## K-means with equal size constraint
+
+Some authors has developped methods that take into account a constraint of equal size of cluster. As an example we have use the function *balanced_cluster()* of the package **anticluster** which make possible to obtain cluster with exacly the same number of individuals. Unfortunately the authors of the package has decided that "exactly means exactly" ... which means that we are obliged to "cheat" our data if the number of units can not be divided by the number of expected cluster ... In our example, we have 1581 units to be divided in 11 circonscription and the program does not work until we add 3 "pseudo units" in order to fulfill the condition $(1584/11 = 144)$. 
+
+```{r}
+## Cheating ...
+tab3 <- tab2[c(1,100,300),]
+tab3$size=0
+tab4<-rbind(tab2,tab3)
+
+## Classif
+coo<-tab4[,3:4]
+cl1 <- balanced_clustering(coo, K=11, method = "centroid")
+
+tab4$CIRC2<-as.factor(cl1)
+tab4 <- tab4[tab4$size !=0,]
+
+ggplot(tab4, aes(x=X, y=Y,size=size, col=CIRC2) )+ 
+              geom_point(alpha=0.4) + 
+              coord_fixed(ratio = 1)  +
+        ggtitle("K-means classification with equal size constraint") + theme_light()
+
+```
+
+The number of units is no equal (except our 3 cheating units) and as a consequence, the circonscription of low density located in the SE of the Val-de-Marne become much larger, contrary to the circonscriptions located near Paris where the density ismuch higher. We can control that the result fit nicely withour expectations in terms of equal population.
+
+
+```{r}
+anaclus <- tab4 %>% group_by(CIRC2) %>% summarise(nbunit = n(), nbinscrits = round(sum(size))) %>% mutate(index = round(100*nbinscrits/mean(nbinscrits),1)) %>% arrange(nbinscrits)
+  
+kable(anaclus)
+```
+
+## Difference between model and reality
+
+```{r}
+
+tab5 <- tab4 %>% select(iris_code, CIRC2) 
+tab5 <- unique(tab5)
+iris <- merge(iris, tab5)
+circ2 <- iris %>% group_by(CIRC2) %>% summarise()
+
+par(mfrow=c(1,2))
+
+## Reality
+mf_map(circ, type="typo", var="circ_code", leg_pos = NA)
+mf_label(circ, var="circ_code",cex = 1.2,halo = T)
+mf_layout("The actual map",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+
+## Model
+mf_map(circ2, type="typo", var="CIRC2", leg_pos = NA)
+mf_label(circ2, var="CIRC2",cex = 1.2,halo = T)
+mf_layout("The results of the model",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+
+
+```
+The holes in the model are related to the fact that some IRIS has not been classified because there was no population inside. But the figures are sufficient to observe similarities and differences between the reality and the model. 
+
+- **Similarity** : As a whole, the two maps are after all not so different and inmany case we can find a correspondance between the circonscription of each map. The similarity would have been higher if we had been able to introduce the contiguity constraint and exclude the division of the circonscription 2 of the model. In this case, the circonscription 10 of the model would certainly be more similar to the actual  circonscription 6. We can also notice that in theoretical as in empirical situation, it is necessary to build a very large circonscription located in the SW corner characterized by low density. This example demonstrate clearly that strong constraints exist in the bordering part of the area which suggest that algorithm should take benefit from this constraint in order to reduce the comlexity of the solutions to be explored.
+
+- **Differences** : But we can notice also huge differences between the actual situation and our model in the central part of the departement. It is particularly obvious in the case of the actual circonscription n°2 that we have suspected in a previous analysis to be a perfect case of gerrymandering. Here, we can see that it was certainly not necessary to create such a geometry and that more compact solutions in terms of internal distance could be found. But of course with consequence with the rest of the system because any modification of a circonscription will have direct and indirect effects on the others ...
+

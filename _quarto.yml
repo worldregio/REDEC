@@ -9,6 +9,8 @@ website:
         text: "Home"
       - href: Layers.qmd
         text: "Cartography"
+      - href: testVDM.qmd
+        text: "Experiment"
     right: 
       - icon: github # add icons as navbar buttons
         href: https://github.com/worldregio/SMA
