@@ -60,7 +60,7 @@
     "href": "testVDM.html#k-means-without-constraint",
     "title": "Classification with population size and euclidean distance constraints",
     "section": "K-means without constraint",
-    "text": "K-means without constraint\nIt is now possible to use classification methods based on the euclidean distance like k-means without constraint and examine the results of clustering for 11 circonscriptions\n\n\n\n\n\n\n\n\n\nAs we can see, the introduction of euclidean distance has produced cluster that fulfill generally the condition of contiguity despite the fact that it was not introduced directly. But looking in more details, we can see that the circonscription n° 9 is in fact splitted in two subgroups divided by the Bois de Vincennes.\nBut the main issue with this first approach is the fact that the units does not fulffil the condition of equal number of building blocks and equal size in terms of inscrits.\n\n\n\n\n\nCIRC\nnbunit\nnbinscrits\nindex\n\n\n\n\n5\n46\n22062\n30.8\n\n\n10\n115\n55735\n77.9\n\n\n3\n126\n62179\n86.9\n\n\n8\n129\n64124\n89.6\n\n\n6\n136\n67167\n93.9\n\n\n1\n138\n70066\n97.9\n\n\n9\n149\n75749\n105.9\n\n\n7\n178\n87393\n122.1\n\n\n4\n177\n88257\n123.3\n\n\n11\n191\n96486\n134.8\n\n\n2\n196\n97928\n136.8\n\n\n\n\n\nLa taille des circonscriptions varie de 36730 à 98416 inscrits ce qui est largement en dehors des limites que nous nous sommes fixés."
+    "text": "K-means without constraint\nIt is now possible to use classification methods based on the euclidean distance like k-means without constraint and examine the results of clustering for 11 circonscriptions\n\n\n\n\n\n\n\n\n\nAs we can see, the introduction of euclidean distance has produced cluster that fulfill generally the condition of contiguity despite the fact that it was not introduced directly. But looking in more details, we can see that the circonscription n° 9 is in fact splitted in two subgroups divided by the Bois de Vincennes.\nBut the main issue with this first approach is the fact that the units does not fulffil the condition of equal number of building blocks and equal size in terms of inscrits.\n\n\n\n\n\nCIRC\nnbunit\nnbinscrits\nindex\n\n\n\n\n5\n50\n24173\n33.8\n\n\n7\n87\n43049\n60.2\n\n\n4\n120\n60494\n84.5\n\n\n8\n131\n63669\n89.0\n\n\n10\n133\n65944\n92.2\n\n\n1\n154\n75448\n105.4\n\n\n11\n156\n77471\n108.3\n\n\n9\n181\n90434\n126.4\n\n\n2\n191\n94804\n132.5\n\n\n3\n188\n95084\n132.9\n\n\n6\n190\n96576\n135.0\n\n\n\n\n\nLa taille des circonscriptions varie de 36730 à 98416 inscrits ce qui est largement en dehors des limites que nous nous sommes fixés."
   },
   {
     "objectID": "testVDM.html#k-means-with-equal-size-constraint",
@@ -75,6 +75,13 @@
     "title": "Classification with population size and euclidean distance constraints",
     "section": "Difference between model and reality",
     "text": "Difference between model and reality\n\n\n\n\n\n\n\n\n\nThe holes in the model are related to the fact that some IRIS has not been classified because there was no population inside. But the figures are sufficient to observe similarities and differences between the reality and the model.\n\nSimilarity : As a whole, the two maps are after all not so different and inmany case we can find a correspondance between the circonscription of each map. The similarity would have been higher if we had been able to introduce the contiguity constraint and exclude the division of the circonscription 2 of the model. In this case, the circonscription 10 of the model would certainly be more similar to the actual circonscription 6. We can also notice that in theoretical as in empirical situation, it is necessary to build a very large circonscription located in the SW corner characterized by low density. This example demonstrate clearly that strong constraints exist in the bordering part of the area which suggest that algorithm should take benefit from this constraint in order to reduce the comlexity of the solutions to be explored.\nDifferences : But we can notice also huge differences between the actual situation and our model in the central part of the departement. It is particularly obvious in the case of the actual circonscription n°2 that we have suspected in a previous analysis to be a perfect case of gerrymandering. Here, we can see that it was certainly not necessary to create such a geometry and that more compact solutions in terms of internal distance could be found. But of course with consequence with the rest of the system because any modification of a circonscription will have direct and indirect effects on the others …"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "REDEC",
+    "section": "",
+    "text": "This github directory is used for cartographic experiments in relation with the REDEC project."
   },
   {
     "objectID": "Layers.html",
@@ -126,10 +133,45 @@
     "text": "GRID DATA AND TRASPORTATION NETWORKS\nThe evaluation of the geometric properties of territorial divisions in terms of compacity or accessibility could be analyzed with the infra-communal data at IRIS level. But the best solution is to used the grid data provided by INSEE at the level of 1km or even 200m. These grid data extract from the census provide information not only on population but also on age, social categories and even income of inhabitants. It can be aggregated at upper level and could to some extent help to solve the problems of correspondance between IRIS and votation offices. These grid data can bu used for geometric measure based on euclideand distance. But they can also be combined with accessibility data by road or public transportation for more precise analysis if needed.\nLets just take an example with another circonscription of the Val-de-Marne localized in the outer periphery with a large superficy\n\nStatic map\nA static map is a projection in euclidean space making possible to compute easily geometric parameter (gravity center, ellipsoid, potential, etc.).\n\n\nWarning: attribute variables are assumed to be spatially constant throughout\nall geometries\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\n\n\n\n\n\n\n\n\n\nDynamic map\nA dynamic map is a non projected map that can be combien with tiles making more easy to analyze the distributions of population in relation with topographic information, network, etc…"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "REDEC",
+    "objectID": "Isere.html",
+    "href": "Isere.html",
+    "title": "Cartographic sources for the analysis of Isere",
     "section": "",
-    "text": "This github directory is used for cartographic experiments in relation with the REDEC project."
+    "text": "Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE\n\n\n\nAttaching package: 'dplyr'\n\n\nThe following objects are masked from 'package:stats':\n\n    filter, lag\n\n\nThe following objects are masked from 'package:base':\n\n    intersect, setdiff, setequal, union"
+  },
+  {
+    "objectID": "Isere.html#objective",
+    "href": "Isere.html#objective",
+    "title": "Cartographic sources for the analysis of Isere",
+    "section": "Objective",
+    "text": "Objective\nThe aim of this note is to examine the different statistical and cartographical sources of interest for the objectives of the REDEC project. We have chosen here the département of Isère because it presents interesting problems of accessibility related to the distribution of mountains and plain, making euclidean distance not very relevant for the measure of distances"
+  },
+  {
+    "objectID": "Isere.html#circonscriptions-cantons",
+    "href": "Isere.html#circonscriptions-cantons",
+    "title": "Cartographic sources for the analysis of Isere",
+    "section": "CIRCONSCRIPTIONS & CANTONS",
+    "text": "CIRCONSCRIPTIONS & CANTONS\nThe most fundamental units for the project are cantons and cicronscription.\n\n10 electoral circonscriptions\n\n\n\n\n\n\n\n\n\n\n\n29 cantons"
+  },
+  {
+    "objectID": "Isere.html#what-about-the-rules",
+    "href": "Isere.html#what-about-the-rules",
+    "title": "Cartographic sources for the analysis of Isere",
+    "section": "What about the rules ?",
+    "text": "What about the rules ?\nThe elaboration of 10 circonscription with 29 cantons as building block should normally be feasible by simple agregation without fragmentation of cantons. But is it the case ?\n\n\n\n\n\n\n\n\n\n\nComment : Looking at the map it seems clear that we are very far from the rules suggested by the law which was to avoid divisions of cantons when it is not necessary for equilibrium of population.More precisely, we can observe that in Isère, the circonscriptions are never a simple agregation of existing cantons. In all cases, circonscription are made of the addition of pieces of cantons and sometimes (but not very frequently) a complete canton. The most facinating example is the case of the circonscription 10 which is made of 6 fragments of cantons (none being complete)."
+  },
+  {
+    "objectID": "Isere.html#what-about-the-commune-of-grenoble",
+    "href": "Isere.html#what-about-the-commune-of-grenoble",
+    "title": "Cartographic sources for the analysis of Isere",
+    "section": "What about the commune of Grenoble ?",
+    "text": "What about the commune of Grenoble ?\nThe commune is very large in terms of population and has been logically divided in four cantons. But what has been decided in terms of circonscriptions ?\n\n\n\n\n\n\n\n\n\n\nComment : Grenoble belongs to the circonscriptions1 and 3. But instead of allocating 2 cantons to each circonscription, we have here an allocation where 3 out of 4 cantons has been broken … Was it really necessary ?"
+  },
+  {
+    "objectID": "Isere.html#population-et-surface",
+    "href": "Isere.html#population-et-surface",
+    "title": "Cartographic sources for the analysis of Isere",
+    "section": "POPULATION ET SURFACE",
+    "text": "POPULATION ET SURFACE\n\nLa grille kilométrique de l’INSEE\nPlutôt que de passer par les communes ou les IRIS dont les limites ne coïncideront de toutes façon pas avec celles des cantons et des circonscriptions, nous proposons de mobiliser une information purement géométrique qui est la grille kilométrique de l’INSEE. Celle-ci se compose de carreaux de 1 x 1 km dans lesquels une grande variété d’information est connue, issue du recensement mais aussi d’autres sources, notamment fiscales.\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\n[1] \"sf\"         \"data.frame\"\n\n\n\n\n\n\n\nComment : We have 5010 grid points where a population greater than 10 inhabitants is located. The population of the cells where less than 10 inhabitants are located has been allocated to neighboring cells with sufficient population. The map of population provide very interesting clues concerning the effect of topography and road accessibility on the choice of limits of circonscriptions. we can for example observe that in many cases the valleys are splitted between two circonscription but according to the limits of the river (talweg). Is it logical ?\n\n(A suivre !)"
   }
 ]

@@ -1,0 +1,184 @@
+---
+title: "Cartographic sources for the analysis of Isere"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+```
+
+
+
+
+## Objective
+
+The aim of this note is to examine the different statistical and cartographical sources of interest for the objectives of the REDEC project. We have chosen here the *département* of Isère because it presents interesting problems of accessibility related to the distribution of mountains and plain, making euclidean distance not very relevant for the measure of distances
+
+```{r,eval=FALSE}
+# Importation des fichiers bruts
+
+circ<-st_read("data38/circonscriptions-de-lisere.geojson")
+saveRDS(circ, "data38/circ38.RDS")
+
+cant<-st_read("data38/limites-des-cantons-de-lisere@isere.geojson")
+saveRDS(cant, "data38/cant38.RDS")
+names(iris)
+iris <- st_read("data38/georef-france-iris.geojson") %>% 
+         mutate(iris_name = as.character(iris_name),
+                iris_code = as.character(iris_code),
+                com_code =as.character(com_code),
+                com_name = as.character(com_name)) %>%
+         select(iris_code, iris_name, com_code, com_name, geometry)%>%
+         st_as_sf()
+
+
+saveRDS(iris, "data38/iris38.RDS")
+com<-iris %>% mutate(com_code =as.character(com_code),
+                     com_name = as.character(com_name)) %>%
+  group_by(com_code, com_name) %>% summarise()
+com<-st_as_sf(com) %>% ungroup()
+saveRDS(com, "data38/com38.RDS")
+
+grid <- readRDS("/Users/claudegrasland1/Desktop/accessibility/gridpop1km/gridpop1km_2019.RDS")
+gri38 <- grid %>% filter(substr(lcog_geo,1,2)==38) 
+saveRDS(gri38,"data38/gri38.RDS")
+
+```
+
+
+
+## CIRCONSCRIPTIONS & CANTONS
+
+
+The most fundamental units for the project are *cantons* and *cicronscription*. 
+
+```{r}
+
+circ<-readRDS("data38/circ38.RDS") %>% st_transform(2154)
+
+cant<-readRDS("data38/cant38.RDS")  %>% st_transform(2154)
+
+com<-readRDS("data38/com38.RDS")  %>% st_transform(2154)
+
+iris<-readRDS("data38/iris38.RDS")  %>% st_transform(2154)
+
+grid<-readRDS("data38/grid38.RDS") %>% st_transform(2154)
+
+```
+
+
+### 10 electoral circonscriptions
+
+```{r}
+mf_map(circ, type="typo", var="numero", leg_pos = NA)
+mf_label(circ, var="numero",cex = 1.2,halo = T)
+mf_layout("The 10 circonscriptions of Isère",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+
+### 29 cantons
+
+```{r}
+mf_map(cant, type="typo", var="numero",leg_pos = NA)
+mf_label(cant, var="numero",cex = 1,halo = T)
+mf_layout("The 29 cantons of Isère",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+## What about the rules ?
+
+The elaboration of 10 circonscription with 29 cantons as building block should normally be feasible by simple agregation without fragmentation of cantons. But is it the case ?  
+
+```{r}
+mf_map(circ, 
+       type="typo",
+       var="numero",
+       leg_pos = "topleft", 
+       border="white", 
+       lwd=1)
+mf_map(cant, type="base", col=NA, border="black", lwd=1, add=T)
+#mf_label(circ, var="numero",cex = 1.2,halo = T)
+mf_layout("Differences between the limits of cantons and circonscriptions",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+- **Comment** : Looking at the map it seems clear that we are very far from the rules suggested by the law which was to avoid divisions of cantons when it is not necessary for equilibrium of population.More precisely, we can observe that in Isère, the **circonscriptions are never a simple agregation of existing cantons**.  In all cases, circonscription are made of the addition of pieces of cantons and sometimes (but not very frequently) a complete canton. The most facinating example is the case of the circonscription 10 which is made of 6 fragments of cantons (none being complete). 
+
+
+## What about the commune of Grenoble ?
+
+The commune is very large in terms of population and has been logically divided in four cantons. But what has been decided in terms of circonscriptions ?
+
+```{r}
+# define a target 
+target <- com %>% filter(com_name == "Grenoble")
+# initiate a map centered on target
+mf_map(target, expandBB = c(0, 0, 0, 0))
+mf_map(circ, 
+       type="typo",
+       var="numero",
+       leg_pos = NA, 
+       border="white", 
+       lwd=1,
+       add=T)
+mf_map(cant, type="base", col=NA, border="black", lwd=1, add=T)
+mf_label(circ, var="numero",cex = 1.2,halo = T)
+mf_map(target, type="base", col=NA,border = "yellow", lty=3, lwd=2, add=T)
+mf_label(target, var="com_name", col="yellow",halo= T, cex=2)
+mf_layout("Zoom on Grenoble",
+          frame=T, scale=T, arrow=F, credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+
+
+```
+
+- **Comment** : Grenoble belongs to the circonscriptions1 and 3. But instead of allocating 2 cantons to each circonscription, we have here an allocation where 3 out of 4 cantons has been broken ... Was it really necessary ?
+
+## POPULATION ET SURFACE
+
+### La grille kilométrique de l'INSEE
+
+Plutôt que de passer par les communes ou les IRIS dont les limites ne coïncideront de toutes façon pas avec celles des cantons et des circonscriptions, nous proposons de mobiliser une information purement géométrique qui est la grille kilométrique de l'INSEE. Celle-ci se compose de carreaux de 1 x 1 km dans lesquels une grande variété d'information est connue, issue du recensement mais aussi d'autres sources, notamment fiscales.
+
+```{r}
+circ4326<-st_transform(circ,4326)
+grid4326 <- grid %>% st_transform(4326)
+gridctr4326<-st_centroid(grid4326)
+class(grid4326)
+myradius <-1+10*sqrt(grid4326$ind)/max(sqrt(grid4326$ind))
+leaflet() %>% 
+          addProviderTiles("Esri.WorldTopoMap") %>% 
+           setView(lat = 45.18, lng=5.72, zoom = 10)%>%
+            addPolygons(data=grid4326,
+                      fillOpacity = 0,
+                      color = "black",
+                      weight = 1,
+                      fillColor = "white") %>%
+          addPolygons(data=circ4326,
+                      fillOpacity = 0.2,
+                      color = "blue",
+                      label = ~numero,
+                      weight = 2,
+                      fillColor = "lightyellow") %>%
+          addCircleMarkers(data=gridctr4326,
+                           radius = myradius,
+                           stroke = FALSE,
+                           fillOpacity = 0.8,
+                           label = ~ind,
+                           fillColor = "red")
+
+```
+
+- **Comment** : We have 5010 grid points where a population greater than 10 inhabitants is located. The population of the cells where less than 10 inhabitants are located has been allocated to neighboring cells with sufficient population. The map of population provide very interesting clues concerning the effect of topography and road accessibility on the choice of limits of circonscriptions. we can for example observe that in many cases the valleys are splitted between two circonscription but according to the limits of the river (talweg). Is it logical ? 
+
+
+(A suivre !)

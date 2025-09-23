@@ -8,9 +8,11 @@ website:
       - href: index.qmd
         text: "Home"
       - href: Layers.qmd
-        text: "Cartography"
+        text: "Geometry of Val-de-Marne"
+      - href: Isere.qmd
+        text: "Geometry of Isere"
       - href: testVDM.qmd
-        text: "Experiment"
+        text: "Clustering experiment"
     right: 
       - icon: github # add icons as navbar buttons
         href: https://github.com/worldregio/SMA
