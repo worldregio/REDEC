@@ -1,0 +1,419 @@
+---
+title: "Minimum théorique sur les systèmes de vote"
+subtitle: "Projet ANR REDEC - 2e version"
+author: "Claude Grasland"
+date: "2026-02-25"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    warning: false
+    comment: false
+---
+
+
+
+```{r}
+#library(ggplot2)
+library(sf)
+library(mapsf)
+
+library(knitr)
+library(dplyr, quietly = T,warn.conflicts = F)
+#library(car)
+#library(reshape2)
+library(tidyr, quietly = T, warn.conflicts = F)
+```
+
+
+
+
+
+
+-----------------------------------------------------------------------
+
+::: {.callout-note title="A propos de ce document"}
+Ce document a été réalisé dans la cadre de la préparation du projet ANR REDEC. Il vise à situer le problème dans un cadre théorique plus large que celui des élections législatives françaises et des élections à la chambre des représentants aux USA.
+:::
+
+
+
+```{r}
+jeu1a <- readRDS("data1/jeu1a.RDS")
+jeu1b <- readRDS("data1/jeu1b.RDS")
+jeu2a <- readRDS("data1/jeu2a.RDS")
+jeu2b <- readRDS("data1/jeu2b.RDS")
+
+
+          
+```
+
+
+
+# DEFINIR UN PAYSAGE THEORIQUE
+
+## Mise en place
+
+On considère un monde composé de 48 positions spatiales, chacune d'entre elles étant occupée par une carte à jouer d'un jeu de 52 cartes dont on a retiré les rois.  Les différentes familles politiques sont au départ au nombre de quatre
+
+
+```{r}
+# Visualisation
+par(mar=c(0,0,1,0), mfrow=c(1,2))
+
+
+# Jeu 1
+jeu<-jeu1a
+plot(jeu$geometry, main="Jeu 1 : tirage aléatoire")
+text(jeu$geometry, jeu$cards, col=jeu$col,cex=1.5)
+
+# Jeu 2
+jeu<-jeu2a
+plot(jeu$geometry, main="Jeu 2 : organisation concentrique")
+text(jeu$geometry, jeu$cards, col=jeu$col,cex=1.5)
+```
+
+- **Commentaire** : on se limite ici à deux situations initiales de répartition des cartes dans un espace de 48 cases. Chaque famille politique occupe exactement 12 cases et toutes les valeurs sont présentes. Dans la situation 2, on a réparti les familles en fonction de la distance au centre de l'espace d'étude, de sorte que ♠ occupe les cases les plus centrales, suivi de ♣ puis ♥ et enfin ♦ dans les zones les plus périphériques. Cette organisation des votes en fonction de la distance aux centres urbains est fréquente dans de nombreux pays. 
+
+
+## A. Modèle classique
+
+On suppose que toutes les cases sont occupées et possèdent la même population. On simplifie la situation des partis politiques pour se ramener à deux partis "rouge" et "bleu"
+
+
+```{r}
+# Jeu 1
+par(mar=c(4,4,4,4), mfrow=c(1,2))
+jeu<-jeu1a %>% mutate(pop=5)
+jeu$bloc<-as.factor(jeu$family)
+levels(jeu$bloc)<-c("blue","blue","red","red")
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "bloc"), 
+       inches=0.1,
+       pal=c("blue","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation A1",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+jeu<-jeu2a %>% mutate(pop=5)
+jeu$bloc<-as.factor(jeu$family)
+levels(jeu$bloc)<-c("blue","blue","red","red")
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "bloc"), 
+       inches=0.1,
+       pal=c("blue","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation A2",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+```
+
+- **Commentaire** : il s'agit de la situation "classique" que l'on retrouve dans tous les manuels de géographie électorale. Notamment les manuels américains ou le maillage territorial prend souvent la forme d'un carroyage.
+
+
+
+## B. Modèle bipartisan strict
+
+On suppose que les cases correspondant aux dames et valets sont inoccupées et possèdent une population de 1 à 10. On conserve quatre partis politiques
+
+
+```{r}
+# Jeu 1
+par(mar=c(4,4,4,4), mfrow=c(1,2))
+jeu<-jeu1b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","blue","red","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation B1",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+jeu<-jeu2b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","blue","red","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation B2",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+
+
+```
+
+- **Commentaire** : il s'agit de la situation retenue par l'ANR REDEC dans sa première version. Le fait de retirer les dames et les valets a créé des zones vides (lacs, mers, montagnes...) qui rendent plus complexe la recherche de partitions connexes. Quant à la population, elle rend plus complexe la recherche de solution assurant l'équilibre démographique entre les circonscriptions. 
+
+
+
+## C. Modèle bipartisan polarisé
+
+A la différence du cas précédent, on conserve quatre partis politiques, soit un système qui demeure bipartisan mais avec l'introduction d'une nuance modérée que l'on va traduire par des teintes plus claires.
+
+
+```{r}
+# Jeu 1
+par(mar=c(4,4,4,4), mfrow=c(1,2))
+jeu<-jeu1b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","lightblue","pink","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation C1",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+jeu<-jeu2b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","lightblue","pink","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation C2",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+
+
+```
+
+- **Commentaire** : il s'agit d'un modèle politique classique qui postule l'existence d'une échelle de vote (e.g. droite-gauche) qui structure le champs politique avec des partis "centristes" et des partis "extrémistes" que l'on va caractériser en termes de polarisation. Cette configuration sera essentielle dans les systèmes électoraux qui supposent des alliances.
+
+## D. Modèle tripartisan 
+
+C'est une variante du modèle précédent mais où on assume cette fois-ci une tripartition et une union des partis centristes contre les deux extrêmes. 
+
+
+```{r}
+
+
+
+par(mar=c(4,4,4,4), mfrow=c(1,2))
+jeu<-jeu1b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","lightyellow","lightyellow","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation D1",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+jeu<-jeu2b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","lightyellow","lightyellow","red"), 
+       add=T,
+       leg_pos = c(NA,NA), leg_horiz = F)
+mf_layout( "Situation D2",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+```
+
+- **Commentaire** : La tripartition a des conséquences très importantes en termes de résultat électoraux puisque le parti "jaune" dispose désormais de 50% des voix et peut en principe emporter l'élection face aux "rouge" et aux "bleus" qui en ont 25% chacun. On demeure toutefois ici sur une variante du modèle bipartisan polarisé puisqu'on suppose que les bleus ne votent jamais pour les rouges et réciproquement. Mais on pourrait aussi imaginer un modèle cyclique avec trois partis non disposés sur un axe...
+
+
+# SYSTEMES DE VOTE ELEMENTAIRES
+
+On peut esquisser une classification des systèmes de vote élémentaires c'est-à-dire correspondant à une éléction unique.
+
+Un système de vote peut-être défini très largement comme une fonction définissant le nombre de représentants $R(p)$ de chaque parti $p_1...p_k$ en fonction des choix de votes des électeurs pour ces partis $E(p)$ et des différents règles régissant le système électoral $rule_1...rule_x$.
+
+$R(p) = f[P(p), rule_1...rule_x]$
+
+
+## 1. SVNT :  Système de vote non territoriaux
+
+Un système de vote est **non_territoriaux** si la position géographique des votants  n'intervient pas dans le résultat électoral. Cela signifie concrètement que le fait que les électeurs soient dans la situation 1 (aléatoire) ou la situation 2 (autocorrélation) n'a aucun impact sur le nombre d'élus de chacun des partis.
+
+### Système proportionnel au plus fort reste
+
+Un système proportionnel à un tour va conduire à des résultats difféents selon les alliances entre parti mais pas en fonction de la position géographique. Si par exemple on doit élire 8 représentants pour l'espace concerné on devrait logiquement obtenir 4 représentants pour chaque parti dans les situation A et B, 2 pour chaque parti dans la situation C, et enfin 4 pour le parti centriste dans la situation D et 1 pour chacun des autres partis.
+
+Si par contre le nombre de représentants est de 3, la situation sera beaucoup plus instable et un très léger changement des votes va aboutir à des résultats différents.
+
+### Système proportionnel avec prime majoritaire
+
+Soit par exemple la règle des élections municipales française (50% à la liste arrivée en tête et répartition des 50% à la proportionnelle au plus fort reste). Supposons qu'il faille élire 8 représentants, dans ce cas une des listes aura 6 élus et l'autre 2 dans les situations A et B qui sont très instables.
+
+Dans la situation C, un parti obtiendra 5 élus et les trois autres 1 seul, dans une situation là encore très instable. Les alliances seront évidemment primordiale puisque les reports de voix à l'intérieur des blocs rouge et bleu déterminera la victoire ou l'échec. 
+
+Dans la situation D, il n'y aura a priori pas de suspenses puisque le bloc centriste devrait obtenir 6 élus et chacun des deux autres partis extrêmes 1 élu. A condition évidemment que l'alliance des partis centristes demeure solide ...
+
+
+## 2. SVT : Systèmes de votes territoriaux
+
+Un système de vote est **territorial** si la position géographique des votants  intervient pas dans le résultat électoral. Cela signifie concrètement que le fait que les électeurs soient dans la situation 1 (aléatoire) ou la situation 2 (autocorrélation) peut avoir un impact sur le nombre d'élus de chacun des partis.
+
+Le point central va donc être l'introduction de **règles spatiales** conditionnant les résultats des différents partis politiques candidats à l'élection. Ces règles sont de différents types ce qui fait le sel de l'affaire. Mais elles comportent toujours au moins deux paramètres :
+
+- un paramètre d'égalité démographique (e.g. marge de variation de 5%)
+- un paramètre de compacité géographique (e.g. connexité stricte)
+
+
+### Choix des partitions
+
+Considérons à titre d'exemple une partition P1 qui respecte la contrainte de connexité (présence d'une frontière commune) dans la situation 1. Nous choisissons une partition en 5 circonscriptions. Ceomme il y a en tout 220 votants, chaque circonscription devrait comporter 44 votants. Si on se donne une marge de tolérance de 10% cela fait de 40 à 49 votants
+
+```{r}
+x<- as.factor(jeu1b$ID)
+
+
+levels(x) <-c( "C1", "C1", "C1", "C1", "C1" ,"C2" ,"C2", 
+                "C1", "C1", "C1", "C2", "C2","C2" ,"C2", 
+                "C5", "C4", "C4", "C2", "C2",
+                "C5" ,"C5", "C4", "C4", "C4","C4", "C3", "C3", 
+                "C5", "C4", "C4", "C3", "C3",
+                "C5", "C5", "C5", "C5","C3", "C3", "C3", "C3")
+jeu1b$P1<-x
+
+tab<-jeu1b %>% group_by(P1) %>% summarise(pop=sum(pop)) %>% st_drop_geometry()
+
+```
+
+
+
+
+Ce maillage respecte la contrainte de connexité et donne des circonscriptions de superficie égale. Mais respecte-t-il la contrainte d'égalité de population ?
+
+```{r}
+Part1<-jeu1b %>% group_by(P1) %>% summarise(pop=sum(pop)) 
+
+
+par(mar=c(4,4,4,4), mfrow=c(1,1))
+mf_map(Part1, type="base",col="gray90")
+mf_map(Part1, type="prop", var="pop", 
+       inches=0.2,
+       add=T,
+       leg_pos = "left", leg_horiz = F)
+mf_label(Part1, var="pop",cex=1.2,col="white",halo = F)
+mf_layout( "Maillage 1 : Egalité de surface",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+
+
+```
+
+- **Commentaire** : Les circonscriptions C1 et C3 respectent la contrainte mais la circonscription C4 est clairement trop petite tandis que les circonscriptions C2 et C5 sont trop grande. Il n'est cependant pas si simple de basculer une population d'une criconscription à une autre sans rompre la contrainte de connexité...
+
+
+On procède donc à des ajustements en rétrocédant des populations de C2 et C5 vers C4 pour aboutir à une nouvelle partition P2 : 
+
+```{r}
+x<- as.factor(jeu1b$ID)
+
+
+levels(x) <-c( "C1", "C1", "C1", "C1", "C1" ,"C2" ,"C2", 
+                "C1", "C1", "C1", "C2", "C2","C2" ,"C2", 
+                "C5", "C4", "C4", "C4", "C2",
+                "C5" ,"C5", "C4", "C4", "C4","C4", "C3", "C3", 
+                "C5", "C4", "C4", "C3", "C3",
+                "C5", "C5", "C4", "C4","C3", "C3", "C3", "C3")
+jeu1b$P2<-x
+
+Part2<-jeu1b %>% group_by(P2) %>% summarise(pop=sum(pop)) 
+
+
+par(mar=c(4,4,4,4), mfrow=c(1,1))
+mf_map(Part2, type="base",col="gray90")
+mf_map(Part2, type="prop", var="pop", 
+       inches=0.2,
+       add=T,
+       leg_pos = "left", leg_horiz = F)
+mf_label(Part2, var="pop",cex=1.2,col="white",halo = F)
+mf_layout( "Maillage 2 : Egalité approximative de population",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+```
+
+
+### Système majoritaire à un tour
+
+
+Quel parti va remporter le maximum de circonscription dans un système majoritaire à un tour utilisant le maillage P2 ? Examinons la carte des votes pour les quatre partis afin de comprendre les stratégies possibles.
+
+
+```{r}
+# Jeu 1
+par(mar=c(4,4,4,4), mfrow=c(1,1))
+jeu<-jeu1b
+mf_map(jeu, type="base",col="gray90")
+mf_map(jeu, type="prop_typo", var=c("pop", "family"), 
+       inches=0.2,
+       pal=c("blue","lightblue","pink","red"), 
+       add=T,
+       leg_pos = c("topleft", "left"), leg_horiz = F)
+mf_map(Part2, type="base",col=NA, border="darkgreen",lwd=3, add=T)
+mf_label(Part2, var="P2",cex=1.5,col="darkgreen",halo = T)
+mf_layout( "Système majoritaire à un tour - Situation C1",frame=T, arrow=F, scale=F,credits="Projet ANR REDEC 2026")
+
+```
+
+La distribution des votes par circonscription est la suivante :
+
+```{r}
+tab<- jeu %>% st_drop_geometry() %>% group_by(family, P2) %>% summarise(n=sum(pop)) %>% pivot_wider(names_from = family, values_from = n,values_fill = 0)
+mat<-as.matrix(tab[,2:5])
+row.names(mat)<-tab$P2
+kable(addmargins(mat),caption = "Votes par parti et circonscription")
+```
+
+Ce qui donne en pourcentage :
+
+```{r}
+kable(addmargins(100*prop.table(mat,1),2), digits=1)
+```
+
+- **Commentaire** : Bien que les quatre partis disposent exactement du même nombre de votants, le parti ♠	et le parti ♣	 gagneront chacun deux circonscriptions, le parti ♦ une seule et le parti ♥ aucune ... 
+
+
+### Système majoritaire à deux tours
+
+Dans le cas d'un système majoritaire à deux tours (ou dans le cas d'un système majoritaire à un tour avec anticipation des résultats) des fusions de liste peuvent aboutir à des résultats très différents. 
+
+#### Bipolarisation 
+
+Dans le cas d'une bipolarisation entre listes d'union rouge ( ♦ et ♥ )  et bleu (♠	et  ♣), les bleus l'emportent dans trois circonscriptions, les rouges dans une seule tandis que la dernière est indécise (partage exact des voix)
+
+#### Tripolarisation 
+
+
+Dans le cas d'une tripolarisation entre liste rouge (♦), liste  bleue (♠) et liste jaune d'union centriste (♥ et ♣), c'est cette dernière qui l'emporte dans trois cas sur cinq, chacune des autres listes gagnant une circonscription.
+
+
+
+
+## 3. SVH : Systèmes de vote hybrides
+
+On peut évidemment combiner les deux systèmes de vote comme dans le cas allemand.
+
+
+# SYSTEMES DE VOTE INTERDEPENDANTS
+
+Nous devons aussi envisager le cas d'un lien entre deux systèmes de vote élémentaires ou plus. C'est-à-dire des cas où le résultat d'une élection a une incidence directe ou indirecte sur une autre élection.
+
+## L'exemple des communes et EPCI
+
+L'élection des conseillers communautaires siégeant dans les EPCI est subordonnée à celle des conseillers municipaux et constitue en pratique une double élection. Le résultat de l'une va donc peser directement sur l'autre puisque l'électeur vote pour une liste dont le succès au niveau communal (nombre de conseillers municipaux) va déterminer le succès au niveau communautaire (nombre d'élus au conseil intercommunal ). 
+
+## L'exemple des élections cantonales et législatives
+
+Il s'agit de deux élections différentes mais qui partagent en principe un maillage territorial commun puisque, sauf exception, les circonscriptions législatives doivent être des agrégats de cantons. Les cantons eux-mêmes devant respecter les limites de communes, sauf si celles-ci sont trop peuplées, on se trouve en présence d'un système de trois élections étroitement imbriquées.
+
+## L'exemple des élections départementales et régionales
+
+Point majeur des débats sur la décentralisation, le choix d'une des deux mailles départementale ou régionale est l'objet de forts clivages politiques. Au point que pour affaiblir les régions, on élit souvent leurs conseillers dans le cadre de départements ...
+
+## L'exemple des élections sénatoriales
+
+Il s'agit du cas extrême d'une élection indirecte dont les résultats dépendent de tout un ensemble de "grands électeurs" relevant de plusieurs élections différentes (communes, intercommunalités, départements, ...)
+
+## Le cas des élections européennes
+
+Tantôt liste nationale unique, tantôt listes par régions administarives, tantôt par régions spécialement créées pour l'occasion comme lors des élections européennes de 2014. Un cas exemplaire de gerrymandering ... Mais qu'il a fallu ensuite modifier car les régions françaises avaient changé ...
+
+![](img/Circonscriptions_françaises_européennes_2014.svg.png)
+
+
+# CONCLUSION
+
+1. Le projet REDEC ne peut évidemment pas traiter tous les cas, mais il doit au moins les énumérer dans un WP théorique et ensuite en isoler un certain nombre pour une étude approfondie.
+2. Le projet REDEC ne peut pas se limiter au cas B d'un système bipartisan mais doit envisager des cas de système polarisé en quatre groupes ou organisé en trois pôles.
+3. On doit analyser simultanément les proximités poilitiques entre les partis et les découpages géographiques si on veut comprendre les stratégies.
+
+

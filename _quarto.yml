@@ -13,6 +13,8 @@ website:
         text: "Geometry of Isere"
       - href: testVDM.qmd
         text: "Clustering experiment"
+      - href: theory.qmd
+        text: "Un peu de théorie ..."
     right: 
       - icon: github # add icons as navbar buttons
         href: https://github.com/worldregio/SMA

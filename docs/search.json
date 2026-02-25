@@ -39,14 +39,14 @@
     "href": "testVDM.html#iris-as-building-blocks",
     "title": "Classification with population size and euclidean distance constraints",
     "section": "IRIS as building blocks",
-    "text": "IRIS as building blocks\nThe IRIS which are part of communes used by the INSEE for census are certainly a better choice. If we except some specific IRIS associated to industrial area, forest, etc, the divisions are generally characterized by relative proximity in terms of population and number of households. They are also relatively homogeneous in terms of housing and social characteristics. Last but not least, they are associated to a very large number of informations and can be, somehow, intersected with electoral data.\n\n\n`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.\n\n\nWarning: Removed 56 rows containing non-finite outside the scale range\n(`stat_bin()`).\n\n\n\n\n\n\n\n\n\nThe fact that the distribution presented here is bimodal can be explained by the fact that the number of inscrits has been derived from the intersection between vote office and IRIS and is not perfectly accurate. But we could use more exact data by using information from census based on age and nationality.\nWhat is important for our example is the fact that IRIS are sufficiently small to make possible solutions for the delineation of circonscription that can more easily met the expectation than communes.\n\n\n56 'NA' values are not plotted on the map."
+    "text": "IRIS as building blocks\nThe IRIS which are part of communes used by the INSEE for census are certainly a better choice. If we except some specific IRIS associated to industrial area, forest, etc, the divisions are generally characterized by relative proximity in terms of population and number of households. They are also relatively homogeneous in terms of housing and social characteristics. Last but not least, they are associated to a very large number of informations and can be, somehow, intersected with electoral data.\n\n\n`stat_bin()` using `bins = 30`. Pick better value `binwidth`.\n\n\nWarning: Removed 56 rows containing non-finite outside the scale range\n(`stat_bin()`).\n\n\n\n\n\n\n\n\n\nThe fact that the distribution presented here is bimodal can be explained by the fact that the number of inscrits has been derived from the intersection between vote office and IRIS and is not perfectly accurate. But we could use more exact data by using information from census based on age and nationality.\nWhat is important for our example is the fact that IRIS are sufficiently small to make possible solutions for the delineation of circonscription that can more easily met the expectation than communes.\n\n\n56 'NA' values are not plotted on the map."
   },
   {
     "objectID": "testVDM.html#equalizing-size-by-duplication-of-iris",
     "href": "testVDM.html#equalizing-size-by-duplication-of-iris",
     "title": "Classification with population size and euclidean distance constraints",
     "section": "Equalizing size by duplication of IRIS",
-    "text": "Equalizing size by duplication of IRIS\nWe propose to transform the distribution of IRIS in order to obtain approximatively equal size units comprise between 250 and 750. For example an IRIS with a size of 800 will be transform in two IRIS of size 400. An IRIS of size 1800 in three IRISof sise 600, etc…\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\nOn obtient ainsi une distribution en unité de taille beaucoup plus voisines qu’avec les IRIS ce qui va permettre de simplifier les analyses ultérieures.\n\n\n`stat_bin()` using `bins = 30`. Pick better value with `binwidth`."
+    "text": "Equalizing size by duplication of IRIS\nWe propose to transform the distribution of IRIS in order to obtain approximatively equal size units comprise between 250 and 750. For example an IRIS with a size of 800 will be transform in two IRIS of size 400. An IRIS of size 1800 in three IRISof sise 600, etc…\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\nOn obtient ainsi une distribution en unité de taille beaucoup plus voisines qu’avec les IRIS ce qui va permettre de simplifier les analyses ultérieures.\n\n\n`stat_bin()` using `bins = 30`. Pick better value `binwidth`."
   },
   {
     "objectID": "testVDM.html#localization-in-euclidian-space",
@@ -60,7 +60,7 @@
     "href": "testVDM.html#k-means-without-constraint",
     "title": "Classification with population size and euclidean distance constraints",
     "section": "K-means without constraint",
-    "text": "K-means without constraint\nIt is now possible to use classification methods based on the euclidean distance like k-means without constraint and examine the results of clustering for 11 circonscriptions\n\n\n\n\n\n\n\n\n\nAs we can see, the introduction of euclidean distance has produced cluster that fulfill generally the condition of contiguity despite the fact that it was not introduced directly. But looking in more details, we can see that the circonscription n° 9 is in fact splitted in two subgroups divided by the Bois de Vincennes.\nBut the main issue with this first approach is the fact that the units does not fulffil the condition of equal number of building blocks and equal size in terms of inscrits.\n\n\n\n\n\nCIRC\nnbunit\nnbinscrits\nindex\n\n\n\n\n7\n71\n34901\n48.8\n\n\n1\n82\n40501\n56.6\n\n\n10\n98\n49003\n68.5\n\n\n6\n107\n54503\n76.2\n\n\n8\n123\n60044\n83.9\n\n\n5\n128\n64935\n90.7\n\n\n11\n136\n66600\n93.1\n\n\n4\n145\n72976\n102.0\n\n\n3\n151\n76419\n106.8\n\n\n9\n256\n126378\n176.6\n\n\n2\n284\n140886\n196.9\n\n\n\n\n\nLa taille des circonscriptions varie de 36730 à 98416 inscrits ce qui est largement en dehors des limites que nous nous sommes fixés."
+    "text": "K-means without constraint\nIt is now possible to use classification methods based on the euclidean distance like k-means without constraint and examine the results of clustering for 11 circonscriptions\n\n\n\n\n\n\n\n\n\nAs we can see, the introduction of euclidean distance has produced cluster that fulfill generally the condition of contiguity despite the fact that it was not introduced directly. But looking in more details, we can see that the circonscription n° 9 is in fact splitted in two subgroups divided by the Bois de Vincennes.\nBut the main issue with this first approach is the fact that the units does not fulffil the condition of equal number of building blocks and equal size in terms of inscrits.\n\n\n\n\n\nCIRC\nnbunit\nnbinscrits\nindex\n\n\n\n\n1\n46\n22062\n30.8\n\n\n7\n80\n40907\n57.2\n\n\n3\n120\n60494\n84.5\n\n\n5\n123\n61341\n85.7\n\n\n9\n129\n62931\n87.9\n\n\n11\n125\n63968\n89.4\n\n\n10\n138\n67211\n93.9\n\n\n6\n167\n83588\n116.8\n\n\n8\n173\n87371\n122.1\n\n\n4\n228\n113291\n158.3\n\n\n2\n252\n123982\n173.3\n\n\n\n\n\nLa taille des circonscriptions varie de 36730 à 98416 inscrits ce qui est largement en dehors des limites que nous nous sommes fixés."
   },
   {
     "objectID": "testVDM.html#k-means-with-equal-size-constraint",
@@ -131,6 +131,97 @@
     "title": "Cartographic sources for the analysis of Val-de-Marne (94)",
     "section": "GRID DATA AND TRASPORTATION NETWORKS",
     "text": "GRID DATA AND TRASPORTATION NETWORKS\nThe evaluation of the geometric properties of territorial divisions in terms of compacity or accessibility could be analyzed with the infra-communal data at IRIS level. But the best solution is to used the grid data provided by INSEE at the level of 1km or even 200m. These grid data extract from the census provide information not only on population but also on age, social categories and even income of inhabitants. It can be aggregated at upper level and could to some extent help to solve the problems of correspondance between IRIS and votation offices. These grid data can bu used for geometric measure based on euclideand distance. But they can also be combined with accessibility data by road or public transportation for more precise analysis if needed.\nLets just take an example with another circonscription of the Val-de-Marne localized in the outer periphery with a large superficy\n\nStatic map\nA static map is a projection in euclidean space making possible to compute easily geometric parameter (gravity center, ellipsoid, potential, etc.).\n\n\nWarning: attribute variables are assumed to be spatially constant throughout\nall geometries\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\n\n\n\n\n\n\n\n\n\nDynamic map\nA dynamic map is a non projected map that can be combien with tiles making more easy to analyze the distributions of population in relation with topographic information, network, etc…"
+  },
+  {
+    "objectID": "theory.html#mise-en-place",
+    "href": "theory.html#mise-en-place",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "Mise en place",
+    "text": "Mise en place\nOn considère un monde composé de 48 positions spatiales, chacune d’entre elles étant occupée par une carte à jouer d’un jeu de 52 cartes dont on a retiré les rois. Les différentes familles politiques sont au départ au nombre de quatre\n\n\n\n\n\n\n\n\n\n\nCommentaire : on se limite ici à deux situations initiales de répartition des cartes dans un espace de 48 cases. Chaque famille politique occupe exactement 12 cases et toutes les valeurs sont présentes. Dans la situation 2, on a réparti les familles en fonction de la distance au centre de l’espace d’étude, de sorte que ♠ occupe les cases les plus centrales, suivi de ♣ puis ♥ et enfin ♦ dans les zones les plus périphériques. Cette organisation des votes en fonction de la distance aux centres urbains est fréquente dans de nombreux pays."
+  },
+  {
+    "objectID": "theory.html#a.-modèle-classique",
+    "href": "theory.html#a.-modèle-classique",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "A. Modèle classique",
+    "text": "A. Modèle classique\nOn suppose que toutes les cases sont occupées et possèdent la même population. On simplifie la situation des partis politiques pour se ramener à deux partis “rouge” et “bleu”\n\n\n\n\n\n\n\n\n\n\nCommentaire : il s’agit de la situation “classique” que l’on retrouve dans tous les manuels de géographie électorale. Notamment les manuels américains ou le maillage territorial prend souvent la forme d’un carroyage."
+  },
+  {
+    "objectID": "theory.html#b.-modèle-bipartisan-strict",
+    "href": "theory.html#b.-modèle-bipartisan-strict",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "B. Modèle bipartisan strict",
+    "text": "B. Modèle bipartisan strict\nOn suppose que les cases correspondant aux dames et valets sont inoccupées et possèdent une population de 1 à 10. On conserve quatre partis politiques\n\n\n\n\n\n\n\n\n\n\nCommentaire : il s’agit de la situation retenue par l’ANR REDEC dans sa première version. Le fait de retirer les dames et les valets a créé des zones vides (lacs, mers, montagnes…) qui rendent plus complexe la recherche de partitions connexes. Quant à la population, elle rend plus complexe la recherche de solution assurant l’équilibre démographique entre les circonscriptions."
+  },
+  {
+    "objectID": "theory.html#c.-modèle-bipartisan-polarisé",
+    "href": "theory.html#c.-modèle-bipartisan-polarisé",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "C. Modèle bipartisan polarisé",
+    "text": "C. Modèle bipartisan polarisé\nA la différence du cas précédent, on conserve quatre partis politiques, soit un système qui demeure bipartisan mais avec l’introduction d’une nuance modérée que l’on va traduire par des teintes plus claires.\n\n\n\n\n\n\n\n\n\n\nCommentaire : il s’agit d’un modèle politique classique qui postule l’existence d’une échelle de vote (e.g. droite-gauche) qui structure le champs politique avec des partis “centristes” et des partis “extrémistes” que l’on va caractériser en termes de polarisation. Cette configuration sera essentielle dans les systèmes électoraux qui supposent des alliances."
+  },
+  {
+    "objectID": "theory.html#d.-modèle-tripartisan",
+    "href": "theory.html#d.-modèle-tripartisan",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "D. Modèle tripartisan",
+    "text": "D. Modèle tripartisan\nC’est une variante du modèle précédent mais où on assume cette fois-ci une tripartition et une union des partis centristes contre les deux extrêmes.\n\n\n\n\n\n\n\n\n\n\nCommentaire : La tripartition a des conséquences très importantes en termes de résultat électoraux puisque le parti “jaune” dispose désormais de 50% des voix et peut en principe emporter l’élection face aux “rouge” et aux “bleus” qui en ont 25% chacun. On demeure toutefois ici sur une variante du modèle bipartisan polarisé puisqu’on suppose que les bleus ne votent jamais pour les rouges et réciproquement. Mais on pourrait aussi imaginer un modèle cyclique avec trois partis non disposés sur un axe…"
+  },
+  {
+    "objectID": "theory.html#svnt-système-de-vote-non-territoriaux",
+    "href": "theory.html#svnt-système-de-vote-non-territoriaux",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "1. SVNT : Système de vote non territoriaux",
+    "text": "1. SVNT : Système de vote non territoriaux\nUn système de vote est non_territoriaux si la position géographique des votants n’intervient pas dans le résultat électoral. Cela signifie concrètement que le fait que les électeurs soient dans la situation 1 (aléatoire) ou la situation 2 (autocorrélation) n’a aucun impact sur le nombre d’élus de chacun des partis.\n\nSystème proportionnel au plus fort reste\nUn système proportionnel à un tour va conduire à des résultats difféents selon les alliances entre parti mais pas en fonction de la position géographique. Si par exemple on doit élire 8 représentants pour l’espace concerné on devrait logiquement obtenir 4 représentants pour chaque parti dans les situation A et B, 2 pour chaque parti dans la situation C, et enfin 4 pour le parti centriste dans la situation D et 1 pour chacun des autres partis.\nSi par contre le nombre de représentants est de 3, la situation sera beaucoup plus instable et un très léger changement des votes va aboutir à des résultats différents.\n\n\nSystème proportionnel avec prime majoritaire\nSoit par exemple la règle des élections municipales française (50% à la liste arrivée en tête et répartition des 50% à la proportionnelle au plus fort reste). Supposons qu’il faille élire 8 représentants, dans ce cas une des listes aura 6 élus et l’autre 2 dans les situations A et B qui sont très instables.\nDans la situation C, un parti obtiendra 5 élus et les trois autres 1 seul, dans une situation là encore très instable. Les alliances seront évidemment primordiale puisque les reports de voix à l’intérieur des blocs rouge et bleu déterminera la victoire ou l’échec.\nDans la situation D, il n’y aura a priori pas de suspenses puisque le bloc centriste devrait obtenir 6 élus et chacun des deux autres partis extrêmes 1 élu. A condition évidemment que l’alliance des partis centristes demeure solide …"
+  },
+  {
+    "objectID": "theory.html#svt-systèmes-de-votes-territoriaux",
+    "href": "theory.html#svt-systèmes-de-votes-territoriaux",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "2. SVT : Systèmes de votes territoriaux",
+    "text": "2. SVT : Systèmes de votes territoriaux\nUn système de vote est territorial si la position géographique des votants intervient pas dans le résultat électoral. Cela signifie concrètement que le fait que les électeurs soient dans la situation 1 (aléatoire) ou la situation 2 (autocorrélation) peut avoir un impact sur le nombre d’élus de chacun des partis.\nLe point central va donc être l’introduction de règles spatiales conditionnant les résultats des différents partis politiques candidats à l’élection. Ces règles sont de différents types ce qui fait le sel de l’affaire. Mais elles comportent toujours au moins deux paramètres :\n\nun paramètre d’égalité démographique (e.g. marge de variation de 5%)\nun paramètre de compacité géographique (e.g. connexité stricte)\n\n\nChoix des partitions\nConsidérons à titre d’exemple une partition P1 qui respecte la contrainte de connexité (présence d’une frontière commune) dans la situation 1. Nous choisissons une partition en 5 circonscriptions. Ceomme il y a en tout 220 votants, chaque circonscription devrait comporter 44 votants. Si on se donne une marge de tolérance de 10% cela fait de 40 à 49 votants\nCe maillage respecte la contrainte de connexité et donne des circonscriptions de superficie égale. Mais respecte-t-il la contrainte d’égalité de population ?\n\n\n\n\n\n\n\n\n\n\nCommentaire : Les circonscriptions C1 et C3 respectent la contrainte mais la circonscription C4 est clairement trop petite tandis que les circonscriptions C2 et C5 sont trop grande. Il n’est cependant pas si simple de basculer une population d’une criconscription à une autre sans rompre la contrainte de connexité…\n\nOn procède donc à des ajustements en rétrocédant des populations de C2 et C5 vers C4 pour aboutir à une nouvelle partition P2 :\n\n\n\n\n\n\n\n\n\n\n\nSystème majoritaire à un tour\nQuel parti va remporter le maximum de circonscription dans un système majoritaire à un tour utilisant le maillage P2 ? Examinons la carte des votes pour les quatre partis afin de comprendre les stratégies possibles.\n\n\n\n\n\n\n\n\n\nLa distribution des votes par circonscription est la suivante :\n\n\n\nVotes par parti et circonscription\n\n\n\n♠\n♣\n♥\n♦\nSum\n\n\n\n\nC1\n17\n9\n13\n8\n47\n\n\nC2\n2\n18\n15\n5\n40\n\n\nC5\n21\n0\n11\n9\n41\n\n\nC4\n7\n9\n8\n24\n48\n\n\nC3\n8\n19\n8\n9\n44\n\n\nSum\n55\n55\n55\n55\n220\n\n\n\n\n\nCe qui donne en pourcentage :\n\n\n\n\n\n\n♠\n♣\n♥\n♦\nSum\n\n\n\n\nC1\n36.2\n19.1\n27.7\n17.0\n100\n\n\nC2\n5.0\n45.0\n37.5\n12.5\n100\n\n\nC5\n51.2\n0.0\n26.8\n22.0\n100\n\n\nC4\n14.6\n18.8\n16.7\n50.0\n100\n\n\nC3\n18.2\n43.2\n18.2\n20.5\n100\n\n\n\n\n\n\nCommentaire : Bien que les quatre partis disposent exactement du même nombre de votants, le parti ♠ et le parti ♣ gagneront chacun deux circonscriptions, le parti ♦ une seule et le parti ♥ aucune …\n\n\n\nSystème majoritaire à deux tours\nDans le cas d’un système majoritaire à deux tours (ou dans le cas d’un système majoritaire à un tour avec anticipation des résultats) des fusions de liste peuvent aboutir à des résultats très différents.\n\nBipolarisation\nDans le cas d’une bipolarisation entre listes d’union rouge ( ♦ et ♥ ) et bleu (♠ et ♣), les bleus l’emportent dans trois circonscriptions, les rouges dans une seule tandis que la dernière est indécise (partage exact des voix)\n\n\nTripolarisation\nDans le cas d’une tripolarisation entre liste rouge (♦), liste bleue (♠) et liste jaune d’union centriste (♥ et ♣), c’est cette dernière qui l’emporte dans trois cas sur cinq, chacune des autres listes gagnant une circonscription."
+  },
+  {
+    "objectID": "theory.html#svh-systèmes-de-vote-hybrides",
+    "href": "theory.html#svh-systèmes-de-vote-hybrides",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "3. SVH : Systèmes de vote hybrides",
+    "text": "3. SVH : Systèmes de vote hybrides\nOn peut évidemment combiner les deux systèmes de vote comme dans le cas allemand."
+  },
+  {
+    "objectID": "theory.html#lexemple-des-communes-et-epci",
+    "href": "theory.html#lexemple-des-communes-et-epci",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "L’exemple des communes et EPCI",
+    "text": "L’exemple des communes et EPCI\nL’élection des conseillers communautaires siégeant dans les EPCI est subordonnée à celle des conseillers municipaux et constitue en pratique une double élection. Le résultat de l’une va donc peser directement sur l’autre puisque l’électeur vote pour une liste dont le succès au niveau communal (nombre de conseillers municipaux) va déterminer le succès au niveau communautaire (nombre d’élus au conseil intercommunal )."
+  },
+  {
+    "objectID": "theory.html#lexemple-des-élections-cantonales-et-législatives",
+    "href": "theory.html#lexemple-des-élections-cantonales-et-législatives",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "L’exemple des élections cantonales et législatives",
+    "text": "L’exemple des élections cantonales et législatives\nIl s’agit de deux élections différentes mais qui partagent en principe un maillage territorial commun puisque, sauf exception, les circonscriptions législatives doivent être des agrégats de cantons. Les cantons eux-mêmes devant respecter les limites de communes, sauf si celles-ci sont trop peuplées, on se trouve en présence d’un système de trois élections étroitement imbriquées."
+  },
+  {
+    "objectID": "theory.html#lexemple-des-élections-départementales-et-régionales",
+    "href": "theory.html#lexemple-des-élections-départementales-et-régionales",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "L’exemple des élections départementales et régionales",
+    "text": "L’exemple des élections départementales et régionales\nPoint majeur des débats sur la décentralisation, le choix d’une des deux mailles départementale ou régionale est l’objet de forts clivages politiques. Au point que pour affaiblir les régions, on élit souvent leurs conseillers dans le cadre de départements …"
+  },
+  {
+    "objectID": "theory.html#lexemple-des-élections-sénatoriales",
+    "href": "theory.html#lexemple-des-élections-sénatoriales",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "L’exemple des élections sénatoriales",
+    "text": "L’exemple des élections sénatoriales\nIl s’agit du cas extrême d’une élection indirecte dont les résultats dépendent de tout un ensemble de “grands électeurs” relevant de plusieurs élections différentes (communes, intercommunalités, départements, …)"
+  },
+  {
+    "objectID": "theory.html#le-cas-des-élections-européennes",
+    "href": "theory.html#le-cas-des-élections-européennes",
+    "title": "Minimum théorique sur les systèmes de vote",
+    "section": "Le cas des élections européennes",
+    "text": "Le cas des élections européennes\nTantôt liste nationale unique, tantôt listes par régions administarives, tantôt par régions spécialement créées pour l’occasion comme lors des élections européennes de 2014. Un cas exemplaire de gerrymandering … Mais qu’il a fallu ensuite modifier car les régions françaises avaient changé …"
   },
   {
     "objectID": "Isere.html",
