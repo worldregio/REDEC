@@ -1,0 +1,494 @@
+---
+title: "Analysis of voting distributin at local level in Val de Marne "
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    comments: false
+    warning: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(dplyr, quietly=T,warn.conflicts = F)
+library(mapview)
+library(knitr)
+library(data.table,quietly=T, warn.conflicts = F)
+library(mapsf, quietly=T, warn.conflicts = F)
+library(tidyr, quietly=T, warn.conflicts = F)
+library(FactoMineR)
+library(explor)
+```
+
+
+
+
+## Objective
+
+The aim of this note is to examine the possibilities to analyze the distribution of votes at the most local level : the voting office (*bureau de vote*). We have chosen the Presidential election of 2022 as reference for the elaboration of clusters of political orientation at local level.
+
+## DATA ELABORATION
+
+
+### Map of voting office
+
+This map has been made available very recently. Despite some problems of geometry, it offers a relatively accurate visualization of the local distribution of votes.
+
+
+```{r}
+mapbv <- readRDS("bv94/mapbv94.RDS")
+donbv <- fread("bv94/pr2022_01.csv")
+
+
+test1 <- donbv %>% select(codecir = `Code de la circonscription`,
+                        codecom = `Code de la commune`,
+                        nomcom = `Libellé de la commune`,
+                       numbv = `Code du b.vote`,
+                       Inscrits,
+                       Votants,
+                       Exprimés,
+                       Blancs,
+                       Nuls,
+
+                       ) %>% 
+                   mutate(Abstention = Inscrits-Votants,
+                           codecom = as.character(codecom),
+                          id_bv = paste(codecom,numbv, sep="_")) %>%
+                unique()
+test1 <- test1[,c(11,1:10)]
+
+test2 <- donbv %>% select(codecir = `Code de la circonscription`,
+                        codecom = `Code de la commune`,
+                        numbv = `Code du b.vote`,
+                        Nom,,
+                       Voix) %>% 
+                   mutate(codecom = as.character(codecom),
+                          Nom = as.factor(Nom)) %>% 
+  pivot_wider(names_from = "Nom",values_from = "Voix") %>% 
+  mutate(red = ARTHAUD + POUTOU + MÉLENCHON + ROUSSEL +HIDALGO + JADOT,
+         blue = `LE PEN` + ZEMMOUR + `DUPONT-AIGNAN`+ LASSALLE,
+         yellow = PÉCRESSE+ MACRON )
+
+
+
+test3 <- mapbv %>% select(id_bv)
+
+
+bv <- test1 %>% left_join(test2) %>% left_join(test3) %>% st_as_sf()
+bv <-st_transform(bv, 2154) %>% filter(id_bv != "94028_46")
+
+mf_map(bv, type="base", 
+       col="gray90",
+       border="black",
+       lwd=0.4)
+
+mf_layout("Map of the 9660 voting office of Val-de-Marne in 2022",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+
+```
+
+- **Comment** : as we can see the map is not perfect because it was based on the agregation of listings of adresses of people. The problem is more apparent iw we zoom on a commune like Boissy-Saint-Léger
+
+```{r}
+sel <- bv %>% filter(codecom==94004)
+mf_map(sel, type="typo", 
+       var="numbv",
+       col="gray90",
+       border="black",
+       lwd=0.4)
+
+mf_layout("The 9 voting offices of Boissy-Saint-Léger in 2022",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+```
+
+- **Comment : ** The geometruc issues can appear in the densely populated area with social housing where the geometry of location of building is not necessarily very consistent (e.g. voting office 7, 8 and 9). But the same problem can appear also  in the low populated area of the forest zone (e.g. voting office 1, 2, 3, 4) where limits are difficult to establish because they are very few locations of inhabitant.
+
+
+
+### Aggregation of voting office into 47 communes
+
+The good news is that the voting offices can be aggregated without by problem by commune because the realization of the map of voting offices bases on the adresses was necessarily limited to the territory of communes.
+
+```{r}
+
+com <- bv %>% group_by(codecom,nomcom) %>% summarise() 
+com$nom_short <- com$nomcom
+
+com$nom_short <- gsub("Villeneuve-le-Roi","VilRoi",com$nom_short)
+com$nom_short <- gsub("Villeneuve-Saint-Georges","VilGeo",com$nom_short)
+com$nom_short <- gsub("Saint-Maur-des-Fossés","SDFoss",com$nom_short)
+com$nom_short <- gsub("Saint-Maurice","SMauri.",com$nom_short)
+com$nom_short <- gsub("Saint-","St",com$nom_short)
+com$nom_short <- gsub("Ville","V",com$nom_short)
+com$nom_short <- substr(com$nom_short,1,6)
+com$nom_short <- gsub("Bri-su","Bry",com$nom_short)
+com$nom_short <- gsub("L'Hay-","HayLR",com$nom_short)
+com$nom_short <- gsub("Ivry-s","Ivry",com$nom_short)
+com$nom_short <- gsub("Le Kre","KB",com$nom_short)
+com$nom_short <- gsub("Le Per","Perreu",com$nom_short)
+com$nom_short <- gsub("Le Ple","Plessi",com$nom_short)
+com$nom_short <- gsub("La Que","Queue",com$nom_short)
+com$nom_short <- gsub("Ablon-","Ablon",com$nom_short)
+com$nom_short <- gsub("Sucy-e","Sucy",com$nom_short)
+com$nom_short <- gsub("Vitry-","Vitry",com$nom_short)
+com$nom_short <- gsub("Bry-su","Bry",com$nom_short)
+
+mf_map(bv, type="base", 
+       col="gray90",
+       border="white",
+       lwd=0.4)
+mf_map(com, type="base", add=T, col=NA, border = "black")
+mf_label(com, var="nom_short", cex=0.6,overlap = F,col="red")
+
+mf_layout("Agregation of voting offices of Val-de-Marne by communes",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+
+```
+
+### Aggregation of voting offices into 11 circonscriptions
+
+```{r}
+cir <- bv %>% group_by(codecir) %>% summarise()
+mf_map(bv, type="typo", 
+       var="codecir",
+       border="white",
+       leg_title = "Circonscription",
+       alpha = 0.5,
+       lwd=0.4)
+mf_map(cir, type="base", add=T, col=NA, border = "black")
+mf_label(cir, var="codecir", cex=1.5,overlap = F,col="red", halo=T)
+
+mf_layout("Agregation of voting offices of Val-de-Marne by circonscriptions",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+
+```
+
+- **Comment** : As we can see, the agregation procedure is less perfect than in the case of commune and  some corrections are needed to correct some mistakes in the geometry. The black lines that indicated the limits of circonscription are sometimes located inside the circonscription when a commune has been divided by a limit of circonscription. Normally, all internal limits of voting office inside circonscription should appear as white lines. 
+
+
+## STRUCTURE OF VOTE IN 2022
+
+We propose now to explore the geography of votes at the presidential election of 2022. 
+
+### Size of voting offices
+
+Due to the fact that we are in urban area, the number of people likely to vote or having voted in 2022 is relatively homogeneous. The situations wouldbe different in rural areas where each commune has normally a voting office, whatever the population.  
+
+
+```{r}
+par(mfrow=c(1,2))
+hist(bv$Inscrits, main = "Theoretical", xlab = "Likely to vote in 2022",    ylab = "number of voting offices")
+hist(bv$Votants,main = "Empirical", xlab = "Having voted in 2022",    ylab = "number of voting offices")
+```
+
+```{r}
+mf_map(bv, type="typo", 
+       var="codecir",
+       border="white",
+       leg_title = "Circonscription",
+       alpha = 0.5,
+       lwd=0.4)
+mf_map(bv, type="prop", 
+       var="Inscrits", 
+       col="gray20",
+       inches=0.04,
+       alpha=1,
+       leg_title = "Nb. registered",
+       leg_pos = "topright",
+       leg_horiz = F,
+       add=T)
+mf_map(cir, type="base", add=T, col=NA, border = "black", lwd=1.2)
+mf_label(cir, var="codecir", cex=1.7,overlap = F,col="red", halo=T)
+mf_layout("Distribution of people registered for vote in 2022",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+```
+
+- **Comment** : the homogeneity of the size of voting offices will be very precious for the exploration of partitions when it is necessary to split communes that are divided in several cantons. We can assume that a voting office is necessarily allocated to one and only one circonscription. And this define therefore the **best atomic level** for the analysis of redistricting
+
+
+### Abstention
+
+What about the probability foran individual to have voted at the presidential election of 2022 ? 
+
+
+
+```{r}
+par(mfrow=c(1,1))
+bv$txpar <-100*bv$Votants/bv$Inscrits
+hist(bv$txpar, main = "Rate of participation in Val de Marne in 2022", 
+     xlab = "Voting / registered (%)",
+     ylab = "number of voting offices")
+```
+
+```{r}
+mf_map(bv, type="choro", var="txpar", 
+       breaks=c(58, 65, 70,75,80,85, 89),
+       leg_title = "% voting",
+       leg_val_rnd = 0,
+       leg_pos = "topleft",
+       border="white",
+       lwd=0.1)
+
+mf_map(com, type="base", add=T, col=NA, border = "black", lwd=1.2)
+#mf_label(com, var="nom_short", cex=0.7,overlap = F,col="red", halo=F)
+
+mf_layout("Participation rate by voting office in 2022 ",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+
+```
+
+- **Comment** : The huge statistical disparities that are observed in the rate of participation (from 58% to 89% !) suggest that even for a presidential election many citizens did not participate to the election. The geography of the abstention is particularly interesting as it is generally strongly correlated with economic and social disparities. Abstention is minimal in riches communes like Vincennes or Saint-Maur-des-Fossés. It is minimal in poorest communes like Valenton and Villeneuve-Saint-Georges. But communes are not homogeneous and in the case of Sucy-en-Brie, for example, the absention is comprised between 69% in the poorest part and 84% in the richest one. 
+
+
+### White and null
+
+What about the people that has vote but with a "white bulletin" (i.e. refuse to choose a candidate) or a "null bulletin" (i.e. has put something different than a candidate name, write something on the bulletin, put two buletins, ...)
+
+
+
+```{r}
+par(mfrow=c(1,1))
+bv$txbn <-100*(bv$Blancs + bv$Nuls)/bv$Votants
+hist(bv$txbn, main = "Share of white and null in Val de Marne in 2022", 
+     xlab = "White and Null /voting (%)",
+     ylab = "number of voting offices")
+```
+
+```{r}
+mf_map(bv, type="choro", var="txbn", 
+       breaks=c(0,1,2,3,4),
+       leg_title = "% voting",
+       pal="Grays",
+       leg_val_rnd = 0,
+       leg_pos = "topleft",
+       border="white",
+       lwd=0.1)
+
+mf_map(com, type="base", add=T, col=NA, border = "black", lwd=1.2)
+#mf_label(com, var="nom_short", cex=0.7,overlap = F,col="red", halo=F)
+
+mf_layout("Share of white and null votes in 2022 ",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+
+```
+
+- **Comment** : The huge statistical disparities that are observed in the rate of participation (from 58% to 89% !) suggest that even for a presidential election many citizens did not participate to the election. The geography of the abstention is particularly interesting as it is generally strongly correlated with economic and social disparities. Abstention is minimal in riches communes like Vincennes or Saint-Maur-des-Fossés. It is minimal in poorest communes like Valenton and Villeneuve-Saint-Georges. But communes are not homogeneous and in the case of Sucy-en-Brie, for example, the absention is comprised between 69% in the poorest part and 84% in the richest one. 
+
+
+## POLITICAL BLOCKS (1) : DEDUCTIVE APPROACH
+
+What are the vote for the different candidates (Mélenchon, Macron, Le Pen, ...) and how to aggregate them in politcal nuances ?
+
+```{r}
+tab<-donbv %>% group_by(Nom) %>% summarise(nb= sum(Voix)) %>% 
+       mutate(pct = 100*nb / sum(nb)) %>% arrange(-nb)
+kable(tab, digits=c(0,0,1), caption = "Résultats de l'élection présidentielle de 2022 dans le Val de Marne")
+```
+
+
+We can adopt a deductive approach where we proceed to an *a priori* definition of political blocks by grouping the vote for different candidates based on external knowledge (preconceived ideas, expert advice, ...). To illustrate this approach we will proceed to a grouping of the results of the presidential election of 2022 in three blocks (tripartition). Some grouping are obvious but other are more subject to debate. 
+
+### "Red block"
+
+We propose to define the "red block" as the sum of votes for ARTHAUD + POUTOU + MÉLENCHON + ROUSSEL +HIDALGO + JADOT. In the context of the presidential election of 2022, all this candidates was likely to vote for each other, even if it was with variable intensities.
+
+
+```{r}
+bv$stock<- bv$red
+bv$pct <-100* bv$red/bv$Exprimés
+
+mf_map(bv, type="choro", var="pct", 
+       breaks=c(0,10,20,30,40,50,100),
+       leg_title = "% of expressed votes ",
+       leg_val_rnd = 0,
+       pal="Reds",
+       leg_pos = "topleft",
+       border="white",
+       lwd=0.1)
+
+mf_map(com, type="base", add=T, col=NA, border = "black", lwd=1.2)
+#mf_label(com, var="codecom", cex=0.6,overlap = F,col="red", halo=T)
+
+mf_layout("Vote for 'red block' in 2022  ",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+```
+
+### "Blue block"
+
+We define the "blue block" as the sum of votes for LE PEN + ZEMMOUR + `DUPONT-AIGNAN`+ LASSALLE. In the context of the presidential election of 2022, all this candidates was likely to vote for each other, even if it can be discussed in teh case of LASSALLE.
+
+
+```{r}
+bv$stock<- bv$blue
+bv$pct <-100* bv$blue/bv$Exprimés
+
+mf_map(bv, type="choro", var="pct", 
+       breaks=c(0,10,20,30,40,50,100),
+     leg_title = "% of valid votes",
+       leg_val_rnd = 0,
+       pal="Blues",
+       leg_pos = "topleft",
+       border="white",
+       lwd=0.1)
+
+mf_map(com, type="base", add=T, col=NA, border = "black", lwd=1.2)
+#mf_label(com, var="codecom", cex=0.6,overlap = F,col="red", halo=T)
+
+mf_layout("Vote for 'blue block' in 2022  ",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+```
+
+
+
+### "Yellow block"
+
+We define the "yellow block" as the sum of votes for MACRON and PECRESSE which has been allied to govern, the country.  In the context of the presidential election of 2022 it was logical to put them together. Things would certainly be different in 2027 ...
+
+
+```{r}
+bv$stock<- bv$yellow
+bv$pct <-100* bv$yellow/bv$Exprimés
+
+mf_map(bv, type="choro", var="pct", 
+       breaks=c(0,10,20,30,40,50,100),
+       leg_title = "% of valid votes",
+       leg_val_rnd = 0,
+       pal="Oranges",
+       leg_pos = "topleft",
+       border="white",
+       lwd=0.1)
+
+mf_map(com, type="base", add=T, col=NA, border = "black", lwd=1.2)
+#mf_label(com, var="codecom", cex=0.6,overlap = F,col="red", halo=T)
+
+mf_layout("Vote for 'yellow block' in 2022  ",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+```
+
+
+
+## POLITICAL BLOCKS (2) : ECOLOGICAL APPROACH
+
+With the ecological approach, we do not try to introduce external informations of the political alliances or proximity. We just try to examine the geographical association between the vote for the different candidates at the smallest scale of observation : the voting office.
+
+To be sure, this type of analysis will reveal positive or negative correlations between the spatial distribution of votes for the different candidates. But these correlations does not necessarily reflect political proximity but rather high competition (positive correlation) or low competition (negative correlation) between candidates at local level. 
+We will use here the method of correspondance analysis, followed by two hierarchical cluster analysis using the chi-square distance. Because of the duality of the method of correspondance analysis, we will obtain at the same time a partition of candidates in political blocks and a partition of voting offices in ecological profiles. 
+
+
+
+### Correspondance analysis
+
+To have a complete view of the political landscape, we decide to relaize our analysis on the full population that was likely to participate to the vote (registered). We add therefore three columns to the list of candidates : abstention, null and white. The fact to analyze the whole population modify the results of the analysis because it introduces new types of association, for example between "white vote" and far-right or between "nuls vote" and far-left.
+
+
+```{r, eval=T}
+
+tab<- bv[,c(1,9:23)] %>% st_drop_geometry()
+row.names(tab)<-tab$id_bv
+afc <- CA(tab[,-1], graph=F)
+#explor(afc)
+
+res <- explor::prepare_results(afc)
+explor::CA_var_plot(res, xax = 1, yax = 2, lev_sup = FALSE, var_sup = FALSE,
+    var_sup_choice = , var_hide = "Row", var_lab_min_contrib = 0, col_var = "Position",
+    symbol_var = NULL, size_var = "Contrib", size_range = c(52.5, 700), labels_size = 10,
+    point_size = 56, transitions = TRUE, labels_positions = NULL, xlim = c(-0.475,
+        0.639), ylim = c(-0.543, 0.571))
+```
+
+- **Comment** : In the département of Val de Marne, the distribution of votes is not exactly organized along a Right-Left line as it can be the case in other déparements. We have rather a triangular opposition between three poles : 
+- **Red Belt pole** (Melenchon,Arthaud, Poutou, Roussel) associated with a high level of abstention and null vote. The area associated to this pole was formally dominated by the communist party and known as "red belt"
+- **Peripheric pole** (Le Pen, Dupont-Aignan, Lassale) associated to "white vote". This pole is certanly to far-right but does not include the vote for Eric Zemmour. The reason is that the vote for the far-right party is different in densely populated area near Paris and in marginal areas located in the suburban part. 
+- **Central pole** (Macron, Jadot, Hidalgo, Pecresse, Zemmour) correspond to richest commune located in the immediate neighbourhood of Paris and characterized by a concentration of vote for classical dominant parties and so-called "moderate". Zemmour is of course an apparent exception but correspond to a variant of far-right vote more in line with rich citizens ...
+
+We can verify with a hierarchical clustering analysis that the division visible on the axes is clearly confirmed by the tree :
+
+```{r}
+cah1<-HCPC(afc,cluster.CA = "columns",nb.clust = 3, graph=F,order = F)
+plot(cah1,choice = "tree")
+```
+
+
+
+
+
+
+```{r, eval=F}
+
+cah2<-HCPC(afc,cluster.CA = "rows",nb.clust = 4, graph=F, order=F)
+plot(cah2,choice = "tree")
+res<-cah2$data.clust
+plot(catdes(res,num.var = 16),barplot=T,cex.names = 0.8, main = "Typology of voting offices")
+
+#catdes(res,num.var = 16)
+```
+
+
+
+
+```{r}
+circo<-readRDS("data94/circ94.RDS")
+circo<-st_transform(circo,2154)
+
+
+bv$typo<-as.factor(res$clust)
+levels(bv$typo)<-c("(1) Far-left & Abstention", "(2) Left & Ecologist","(4) Far-right", "(3) Right & Center")
+bv$typo <- as.character(bv$typo)
+
+
+mf_map(bv, type="typo", var="typo", 
+
+       leg_title = "Type",
+       leg_val_rnd = 0,
+       pal=c("red","pink","lightblue","blue"),
+       alpha=0.6,
+       leg_pos = "topleft",
+       border="white",
+       lwd=0.1)
+
+mf_map(com, type="base", add=T, col=NA, border = "gray20", lwd=1)
+mf_label(com, var="nom_short", cex=0.6,overlap = F,col="gray20")
+mf_map(circo, type="base", add=T, col=NA, border = "black", lwd=2.4)
+mf_label(circo, var="circ_code", cex=1.4,overlap = F,col="black", halo=T)
+
+mf_layout("Typology of voting attitude in 2022  ",
+          frame = T, 
+          scale = T,
+          arrow = F,
+          credits = "(c) C. Grasland - Projet REDEC -  Sources : INSEE, IGN, Min. Intérieur")
+
+
+```
+
