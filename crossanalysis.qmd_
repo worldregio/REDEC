@@ -1,0 +1,156 @@
+---
+title: "Cross analysis "
+subtitle:
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    comments: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf,warn.conflicts = F,quietly = T,verbose = F)
+library(dplyr,warn.conflicts = F,quietly = T, verbose=F)
+library(leaflet)
+
+## Case 1
+mydep1 <-"94"
+mynomdep1 <-"Val-de-Marne"
+bv1 <-readRDS(paste0("map/bv",mydep1,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
+ci1 <-readRDS(paste0("map/bv",mydep1,"/mapcir_inscrits.RDS")) %>% st_transform(2154)
+
+## Case 2 
+mydep2 <- "38"
+mynomdep2 <- "Isère"
+bv2<-readRDS(paste0("map/bv",mydep2,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
+ci2 <-readRDS(paste0("map/bv",mydep2,"/mapcir_inscrits.RDS")) %>% st_transform(2154)
+
+
+## Case 3 
+mydep3 <- "80"
+mynomdep3 <-"Somme"
+bv3<-readRDS(paste0("map/bv",mydep3,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
+ci3 <-readRDS(paste0("map/bv",mydep3,"/mapcir_inscrits.RDS")) %>% st_transform(2154)
+
+## Case 4 
+mydep4 <- "49"
+mynomdep4 <- "Maine-et-Loire"
+bv4<-readRDS(paste0("map/bv",mydep4,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
+ci4 <-readRDS(paste0("map/bv",mydep4,"/mapcir_inscrits.RDS")) %>% st_transform(2154)
+
+
+
+```
+
+
+
+## 1. Voting offices 
+
+
+```{r, fig.width=10, fig.height=8}
+par(mfrow=c(2,2))
+
+mymap<-function(bv,ci,mydep, mynomdep){
+  ci <-st_buffer(ci,10)
+  nbc<-dim(ci)[1]
+  bv$Num <- substr(bv$circode,3,4)
+  bv<-st_make_valid(bv)
+  nbv<-dim(bv)[1]
+  
+  mf_map(bv, type="typo",var="Num", 
+         alpha=0.2, 
+         leg_pos = "topleft", 
+         border="gray30",
+         lwd=0.2)
+  mf_map(ci, type="base",col=NA,lwd=2,border="black", add=T)
+   mf_prop(ci, var="ins",
+           col="white",symbol = "square",
+           inches=0.2, 
+           leg_pos = NA, leg_title = "Inscrits", border="black")
+    mf_label(ci, var="ins", halo=F)
+    mf_layout(paste0(mynomdep, " (",mydep,") : " ,nbv, " voting offices & ", nbc, " circonscriptions"),
+          frame=T,
+          scale=T,
+          arrow=F,
+          credits = "Sources : INSEE, IGN, Min. Intérieur (2022-2026)
+Author : Grasland C., 2026, Preparation of case studies for ANR REDEC")
+}
+
+
+
+##
+mymap(bv1,ci1,mydep1,mynomdep1)
+mymap(bv2,ci2,mydep2,mynomdep2)
+mymap(bv3,ci3,mydep3,mynomdep3)
+mymap(bv4,ci4,mydep4,mynomdep4)
+
+
+
+
+```
+
+
+## 2. Communes
+
+
+
+```{r}
+com3 <-readRDS(paste0("map/bv",mydep,"/mapcom_inscrits.RDS")) %>% st_transform(2154) %>% arrange(-ins)
+
+top5<-com3[1:5,]
+nbc<-dim(com3)[1]
+mf_map(com3, type="base", col="lightyellow")
+mf_prop(com3, var="ins",col="red",symbol = "square",inches=0.2,
+        leg_title = "Nb. of inscrits")
+mf_label(top5, var="comname",halo=T)
+mf_layout(paste0("Cartogramme of the ",nbc, " communes* of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          credits = "* Communes are aggregated if they sahre the same voting office ")
+
+```
+
+## 3. Cantons
+
+
+```{r}
+can3 <-readRDS(paste0("map/bv",mydep,"/mapcan_inscrits.RDS")) %>% st_transform(2154) 
+can3 <- st_buffer(can3,10)
+nbc<-dim(can3)[1]
+mf_map(can3, type="base", col="lightyellow")
+mf_prop(can3, var="ins",col="red",symbol = "square",inches=0.2,
+        leg_title = "Nb. of inscrits")
+mf_label(can3, var="ins",halo=T)
+mf_layout(paste0("Cartogramme of the ",nbc, " cantons of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          credits =  "Nb. of inscrits based on presidential election of 2022 ")
+
+```
+
+## 4. Circonscriptions
+
+
+```{r}
+cir3 <-readRDS(paste0("map/bv",mydep,"/mapcir_inscrits.RDS")) %>% st_transform(2154) 
+cir3 <-st_buffer(cir3,10)
+nbc<-dim(cir3)[1]
+cir3$circode <- substr(cir3$circode,3,4)
+mf_map(cir3, type="typo", 
+       var="circode", 
+       leg_pos = "left", 
+       alpha=0.5, 
+       leg_title = "Circonscription")
+mf_prop(cir3, var="ins",col="red",symbol = "square",inches=0.2,
+        leg_title = "Nb. of inscrits", leg_pos = "topright")
+mf_label(cir3, var="ins",halo=T)
+mf_layout(paste0("Cartogramme of the ",nbc, " circonscriptions of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          arrow=F,
+          credits = "Nb. of inscrits based on presidential election of 2022 ")
+
+```

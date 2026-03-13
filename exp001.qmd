@@ -1,0 +1,285 @@
+---
+title: "K-means clustering in demographic space"
+subtitle: "Experiments on Val-de-Marne"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+library(knitr)
+library(anticlust)
+```
+
+
+
+
+## Objective
+
+The aim of this note is to experiment methods of classification with population and euclidean distance constraint. They don not fulfill necessarily the contiguity constraint but offers some interesting results for discussion
+
+
+```{r}
+circ<-readRDS("map/bv94/mapcir_inscrits.RDS") %>% st_transform(2154)
+#cant<-readRDS("data94/cant94.RDS")  %>% st_transform(2154)
+com<-readRDS("map/bv94/mapcom_inscrits.RDS")  %>% st_transform(2154)
+#iris<-readRDS("data94/iris94.RDS")  %>% st_transform(2154)
+bv<-readRDS("map/bv94/mapbv_inscrits.RDS") %>% st_transform(2154)
+#grid<-readRDS("data94/grid94.RDS")  %>% st_transform(2154)
+```
+
+
+## 1. The official division in 11 districts 
+
+We remind the spatial organisation of the 11 electoral circonscriptions of the Val de Marne that has been described in the previous analysis
+
+```{r}
+mf_map(circ, type="typo", var="circode", leg_pos = "left",alpha=0.5, leg_title = "N° circode")
+mf_map(com, type="base",col=NA, border="white", add=T)
+mf_map(circ, type="base",col=NA, border="black", add=T, lwd=2)
+mf_map(circ, type="prop", var="ins", leg_pos = "topright",leg_title = "Nb. inscrits", add=T,inches=0.25)
+mf_label(circ, var="ins",halo = F,col = "white")
+mf_layout("Situation 1 : Official division of circonscription in 2022",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+```
+
+Using the number of *inscrits* as criterium, we can see that the average size of circonscription should be :
+
+```{r}
+tot <- sum(bv$ins, na.rm=T)
+paste("Number of inscrits : " ,tot)
+paste("Number of circonscriptions : 11")
+paste("Ideal size : ", round(tot/11))
+paste("Margin with + or - 10% : [",round(0.9*tot/11),";",round(1.1*tot/11),"]")
+```
+
+We can check the deviation to average in 2022 for the number of registered (*inscrits*), voting (*votants*) and voting for a candidate (*exprimés*) :
+
+```{r}
+tab <- bv %>% st_drop_geometry() %>%
+               group_by(circode) %>% 
+  summarise(ins = sum(ins)) %>%
+  mutate(Inscrits_dev = 100*ins/mean(ins)-100,
+         )
+kable(tab, digits=c(0,0,1))
+```
+
+- **Comment : ** We can notice very strong deviations to the average size, whatever the criteria used. If we use the legal criterium of people allowed to vote (registered) the extreme situation are observed in circonscription 9 with only 53579 *inscrits* (-26%) and the opposite case in circonscription 5 with 89753 *inscrits* (+ 24%)
+
+
+
+## 2. An heursitic division based on communes
+
+Can we use the commune as building blocks ?
+
+```{r}
+mapcom <- bv %>%  group_by(comname) %>% 
+               summarise(Inscrits = sum(ins, na.rm=T)) %>% 
+              arrange(-Inscrits)
+tabcom <- st_drop_geometry(mapcom)
+kable(head(tabcom))
+```
+
+At first glance, it seems to be possible because none of the commune has a number of inscrits higher than the upper limit of size. If we consider the topology of the location of big and small communes, it appears that some aggregation of communes are obvious, like in the northern part of the Bois de Vincennes (StMandé + Vincennes + Fontenay-sous-Bois)
+
+```{r}
+
+x <- mapcom
+mf_map(x, type = "base", col="lightyellow")
+mf_map(x, type = "prop", var="Inscrits", inches = 0.3, col= "red")
+mf_label(x,var = "Inscrits",halo = T, cex=0.6)
+mf_layout("Distribution of inscrits by commune in 2022",credits = "ANR-REDEC",
+          scale = T, arrow=F, frame=T)
+
+```
+
+We have elaborated an heuristic division which try to elaborate 11 circonscriptions of approximaively equal size without any partition ocf communes.
+
+
+```{r}
+mapcom$part <- as.factor(mapcom$comname)
+levels(mapcom$part)<-c(
+ "02"     ,     "09"        ,      "11"           ,      
+ "03"   ,    "01"  ,     "05"      ,     
+ "07"                ,   "04"  ,    "08"   ,    
+ "04" ,  "07"        ,   "02"        ,   
+ "09"                 , "06"     ,  "07"               ,  
+ "11"       ,          "10" ,          "01"      , 
+ "07" ,         "03" ,        "11"      ,
+"05",     "04" ,      "03"      ,  
+"08"       ,    "03"   ,     "03"      ,  
+ "05"     ,    "03"             ,     "02"                 ,   
+"04"     ,  "03"               ,   "07"                ,  
+"06"     ,         "01"  ,  "08"         ,  
+"03"          ,        "03"        ,     "02"                ,  
+"03"          ,       "03"         ,    "11"             ,  
+"02"  ,      "02", "05"    ,  
+"06"           ,     "10" )
+mapcom$part <- as.factor(as.character(mapcom$part))
+
+x <- mapcom %>% group_by(part) %>% summarise(Inscrits=sum(Inscrits))
+x<-st_buffer(x,10)
+
+mf_map(x, type="typo", var="part", leg_pos = "left",alpha=0.5, leg_title = "N° circonscription")
+mf_map(mapcom, type="base",col=NA, border="white", add=T)
+mf_map(x, type="base",col=NA, border="black", add=T, lwd=2)
+mf_map(x, type="prop", var="Inscrits", leg_pos = "topright",leg_title = "Nb. inscrits", add=T,inches=0.2)
+mf_label(x, var="Inscrits",halo = F,col = "white")
+mf_layout("Situation 2 : Aggregation of communes",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+
+
+```
+
+
+```{r}
+tab <- x %>% st_drop_geometry() %>%
+  mutate(Inscrits_dev = 100*Inscrits/mean(Inscrits)-100,
+         )
+kable(tab, digits=c(0,0,1))
+```
+
+As we can see the result is better than the official division in terms of equal number of inscrits. Th minimum is 65022 (-10.1% of target) and the maximum 81755 (+13% of target). We can therefore really ask why the rule of the game was to use cantons and to allow the splitting of communes ...
+
+
+## 3. k-means applied to voting office with demographic distance
+
+Suppose now that we use as initial building blocks the division in 804 voting offices, withour considering the limits of communes as a constraint. In the case of Val-de-Marne, the size of voting office is very regular because each commune has a sufficient population to have several voting office.And we can suppose that their maximum size is defined by the law. 
+
+
+```{r}
+bv$Inscrits <-bv$ins
+ggplot(bv, aes(x=Inscrits)) + geom_histogram() + ggtitle("Number of inscrits by BV in Val-de-Marne in 2020")
+```
+
+We use it a map where the geometry has been transformed in order tomake the area proportional to the number of registred people (inscrits). It is therefoer a *demographic space* whee the distance between two point is not a number of kilometers but a number of people. What is called by the sociologist Samuel Stouffer (1942) an amount of *intervening opportunities*.
+
+
+```{r}
+
+mf_map(com, type = "base", col="lightyellow")
+mf_map(bv, type = "prop", var="Inscrits", inches = 0.06, col= "red")
+mf_layout("Distribution of inscrits by voting office",credits = "ANR-REDEC",
+          scale = T, arrow=F, frame=T)
+
+```
+
+
+The coordinates in this demographic space  to benefit from some interesting properties and make possible to use existing algorithm of classification.
+We can for example use classification methods based on distance like k-means without constraint and examine the results of clustering for 11 circonscriptions
+
+
+```{r}
+coo<-st_coordinates(st_centroid(bv))
+bv$X <- coo[,1]
+bv$Y  <- coo[,2]
+bv$size <- bv$Inscrits
+tab2<-bv %>% select(X,Y,size) %>% st_drop_geometry()
+coo<-as.matrix(cbind(tab2$X,tab2$Y))
+set.seed(42)
+cl1 <- kmeans(x = coo, center=11)
+tab2$CIRC<-as.factor(cl1$cluster)
+
+ggplot(tab2, aes(x=X, y=Y,size=size, col=CIRC) )+ 
+              geom_point(alpha=0.4, cex=2) + 
+              coord_fixed(ratio = 1)  +
+        ggtitle("K-means classification without constraints") + theme_light()
+```
+
+As we can see, the introduction of euclidean distance in demographic space has produced cluster that fulfill generally the condition of contiguity except in one case. The resulting partition is also relatively equal in terms of number of inscrits, except when the border is complex like inthe northern part arount the Bois de Voncennes. 
+
+```{r}
+bv$part2<-tab2$CIRC
+x <- bv %>% group_by(part2) %>% summarise(Inscrits=sum(Inscrits))
+x<-st_buffer(x,10)
+
+mf_map(x, type="typo", var="part2", leg_pos = "left",alpha=0.5, leg_title = "N° circonscription")
+mf_map(mapcom, type="base",col=NA, border="white", add=T)
+mf_map(x, type="base",col=NA, border="black", add=T, lwd=2)
+mf_map(x, type="prop", var="Inscrits", leg_pos = "topright",leg_title = "Nb. inscrits", add=T,inches=0.25)
+mf_label(x, var="Inscrits",halo = F,col = "white")
+mf_layout("Situation 3 : k-means distance in demographic space",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+
+```
+
+
+
+```{r}
+anaclus <- tab2 %>% group_by(CIRC) %>% summarise(nbunit = n(), nbinscrits = round(sum(size))) %>% mutate(index = round(100*nbinscrits/mean(nbinscrits),1)) %>% arrange(nbinscrits)
+  
+kable(anaclus)
+```
+
+
+The resulting division is less optimal than the heuristic aggregation of communes. But no very different from the official one, with a minimum of 47612 (-34%) and a maximum of 87191 (+21%) 
+
+
+## 4. K-means in demographic space with equal size constraint
+
+Some authors has developped methods that take into account a constraint of equal size of cluster. As an example we have use the function *balanced_cluster()* of the package **anticluster** which make possible to obtain cluster with exacly the same number of individuals. Unfortunately the authors of the package has decided that "exactly means exactly" ... which means that we are obliged to "cheat" our data if the number of units can not be divided by the number of expected cluster ... In our example, we have 804 units to be divided in 11 circonscription and the program does not work as it can not be divided by 11 without decimal. But if we aggregate only two offices with their neighbors, we arrive at 803 units which can be divided by 11 $803/11 ==73$
+
+```{r}
+
+## Cheating ...
+
+tab3<-rbind(tab2,tab2,tab2,tab2,tab2,tab2,tab2,tab2,tab2,tab2,tab2)
+#dis<-st_distance(st_centroid(bv[-1,]))
+#ctg<-st_intersects(bv[-1,],bv[-1,],sparse = F)
+
+## Classif
+coo<-tab3[,1:2]
+cl1 <- balanced_clustering(coo, K=11, method = "centroid")
+
+
+
+tab3$CIRC2<-as.factor(cl1)
+tab3<-tab3[1:804,]
+#tab3 <- tab3[tab3$size !=0,]
+
+```
+
+
+The algorithm will produce circonscriptions with the same number of voting office. And as the voting office has generally equivalent size, the result will be approximatively equivalent when we aggregate.
+
+
+```{r}
+bv$part3<-tab3$CIRC2
+x <- bv %>% group_by(part3) %>% summarise(Inscrits=sum(Inscrits))
+x<-st_buffer(x,10)
+
+mf_map(x, type="typo", var="part3", leg_pos = "left",alpha=0.5, leg_title = "N° circonscription")
+mf_map(mapcom, type="base",col=NA, border="white", add=T)
+mf_map(x, type="base",col=NA, border="black", add=T, lwd=2)
+mf_map(x, type="prop", var="Inscrits", leg_pos = "topright",leg_title = "Nb. inscrits", add=T,inches=0.25)
+mf_label(x, var="Inscrits",halo = F,col = "white")
+mf_layout("Situation 4 : equal size k-means in demographic space",
+          frame=T, scale=T, arrow=F, 
+          credits= "Projet REDEC, C. Grasland, Univ. Paris Cité")
+
+```
+
+
+```{r}
+anaclus <- tab3 %>% group_by(CIRC2) %>% summarise(nbunit = n(), nbinscrits = round(sum(size))) %>% mutate(index = round(100*nbinscrits/mean(nbinscrits),1)) %>% arrange(nbinscrits)
+  
+kable(anaclus)
+```
+
+We obtain here the best partition with a minimum of 66691 (-7.8%) and a maximum of 79299 (+ 9.6%). Our objective to avoid a variation lower or greater than 10 % as compared to the target is fullfiled !
+
+
+## Discussion
+
+This analysis confirms that the legal obligation to build circonscription has aggregates of communes limits the possibility to reach optimal solutions and create a legal confusion between two elections. The cantons are instrument of local elections (département) when circonscription are instrument of national elections. Using the voting office as building blocks would be more logical if we admit that a member of the parliament is not defending a local area but elabrating national policy ... 

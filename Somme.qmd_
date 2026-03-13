@@ -1,0 +1,187 @@
+---
+title: "Political divisions and voting orientations"
+subtitle: "The case of Somme (80)"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    comments: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf,warn.conflicts = F,quietly = T,verbose = F)
+library(dplyr,warn.conflicts = F,quietly = T, verbose=F)
+library(leaflet)
+mydep <-"80"
+mynomdep <-"Somme"
+capnom <- "Amiens"
+capcode <- "80021"
+```
+
+
+The aim of this note is to examine the different statistical and cartographical sources of interest for the objectives of the REDEC project. 
+
+
+# Preparation of data
+
+We use the voting offices as basic territorial units for all the analysis of electoral results.
+
+## The map of INSEE
+
+The geometry of voting offices has been made available only very recently by INSEE through an automatic recognition of the location of adresses on listings [(INSEE, 2023, Proposition de contour des bureaux de vote)](https://www.data.gouv.fr/datasets/proposition-de-contours-des-bureaux-de-vote). The raw map offers a complete coverage of the territory of the departement :
+
+```{r}
+bv<-readRDS(paste0("map/bv",mydep,"/mapbv.RDS")) %>% st_transform(2154)
+nbv<-dim(bv)[1]
+mf_map(bv, type="base",col="lightyellow")
+mf_layout(paste0("The ",nbv, " voting offices of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          credits = "Source : INSEE & IGN, 2023 - Author : Grasland C., 2026, ANR REDEC")
+
+```
+
+The geometry of map is relatively simple in rural areas where voting offices correspond to the geometry of a commune or an aggregate of communes. But situation is more complex in urban areas.
+
+
+```{r}
+cap<-bv %>% filter(comcode==capcode)
+nbvcap <- dim(cap)[1]
+mf_map(cap, type="base",col="lightyellow")
+mf_layout(paste0("Map of the ",nbvcap, " voting offices of ",capnom, " (",mydep,")"),
+          frame=T,
+          credits = "Source : INSEE & IGN, 2023 - Author : Grasland C., 2026, ANR REDEC")
+
+
+```
+
+## Generalisation of the map
+
+We have created a simplified map using Voronoï triangulation applied to the geometric center of the area covered by voting offices. As a consequence, some details are lost but the map become more easy to use for topological and spatial analysis.
+
+
+```{r}
+bv2<-readRDS(paste0("map/bv",mydep,"/mapbv_voronoi.RDS")) %>% st_transform(2154)
+cap<-bv2 %>% filter(comcode==capcode)
+nbvcap <- dim(cap)[1]
+mf_map(cap, type="base",col="lightyellow")
+mf_layout(paste0("Simplified map of the ",nbvcap, " voting offices of ",capnom, " (",mydep,")"),
+          frame=T,
+          credits = "Source : INSEE & IGN, 2023 - Author : Grasland C., 2026, ANR REDEC")
+
+
+```
+
+## Cartogram transformation
+
+As we are interested in election, we realize a third version of the map of voting officies where the area is made proportional to the number of registred people (*inscrits*). We use the presidential election of 2022 as reference.
+
+
+```{r}
+
+bv3<-readRDS(paste0("map/bv",mydep,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
+cap<-bv3 %>% filter(comcode==capcode)
+nbvcap <- dim(cap)[1]
+mf_map(cap, type="base",col="lightyellow")
+mf_label(cap, var="ins", col="red", cex=0.5,halo=T)
+mf_layout(paste0("Cartogramme of inscrits in the ",nbvcap, " voting offices of ",capnom, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          credits = "Source : INSEE & IGN, 2023 - Author : Grasland C., 2026, ANR REDEC")
+
+
+```
+
+
+# Cartogram vizualisation
+
+We propose to visualize the number of registered people (*inscrits*) at different levels through cartogrammes.
+
+## 1. Voting offices 
+
+
+```{r}
+bv3<-st_make_valid(bv3)
+mf_map(bv3, type="base",col="lightyellow")
+mf_prop(bv3, var="ins",col="red",symbol = "square",inches=0.05,
+        leg_title = "Nb. of inscrits")
+mf_layout(paste0("Cartogramme of the ",nbv, " voting offices of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          credits = "Source : INSEE & IGN, 2023 - Author : Grasland C., 2026, ANR REDEC")
+
+
+```
+
+
+## 2. Communes
+
+
+
+```{r}
+com3 <-readRDS(paste0("map/bv",mydep,"/mapcom_inscrits.RDS")) %>% st_transform(2154) %>% arrange(-ins)
+
+top5<-com3[1:5,]
+nbc<-dim(com3)[1]
+mf_map(com3, type="base", col="lightyellow")
+mf_prop(com3, var="ins",col="red",symbol = "square",inches=0.4,
+        leg_title = "Nb. of inscrits")
+mf_label(top5, var="comname",halo=T)
+mf_layout(paste0("Cartogramme of the ",nbc, " communes* of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          credits = "* Communes are aggregated if they sahre the same voting office ")
+
+```
+
+## 3. Cantons
+
+
+```{r}
+can3 <-readRDS(paste0("map/bv",mydep,"/mapcan_inscrits.RDS")) %>% st_transform(2154) 
+can3 <- st_buffer(can3,10)
+nbc<-dim(can3)[1]
+mf_map(can3, type="base", col="lightyellow")
+mf_prop(can3, var="ins",col="red",symbol = "square",inches=0.2,
+        leg_title = "Nb. of inscrits")
+mf_label(can3, var="ins",halo=T)
+mf_layout(paste0("Cartogramme of the ",nbc, " cantons of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          credits =  "Nb. of inscrits based on presidential election of 2022 ")
+
+```
+
+## 4. Circonscriptions
+
+
+```{r}
+cir3 <-readRDS(paste0("map/bv",mydep,"/mapcir_inscrits.RDS")) %>% st_transform(2154) 
+cir3 <-st_buffer(cir3,10)
+nbc<-dim(cir3)[1]
+cir3$circode <- substr(cir3$circode,3,4)
+mf_map(cir3, type="typo", 
+       var="circode", 
+       leg_pos = "left", 
+       alpha=0.5, 
+       leg_title = "Circonscription")
+mf_prop(cir3, var="ins",col="red",symbol = "square",inches=0.2,
+        leg_title = "Nb. of inscrits", leg_pos = "topright")
+mf_label(cir3, var="ins",halo=T)
+mf_layout(paste0("Cartogramme of the ",nbc, " circonscriptions of ",mynomdep, " (",mydep,")"),
+          frame=T,
+          scale=F,
+          arrow=F,
+          credits = "Nb. of inscrits based on presidential election of 2022 ")
+
+```
+
+
+
+```{r}
+mf_map(bv3,type="typo",var="top", lwd=0.1, alpha=0.5, pal=c("darkblue","gold","red"))
+mf_map(cir3,type="base",col=NA, lwd=2,add=T)
+```
+

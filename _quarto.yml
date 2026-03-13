@@ -7,21 +7,35 @@ website:
     left:
       - href: index.qmd
         text: "Home"
-      - href: theory.qmd
-        text: "Theory"        
-      - href: Layers.qmd
-        text: "Geometry of Val-de-Marne"
-      - href: Isere.qmd
-        text: "Geometry of Isere"
-      - href: testVDM3.qmd
-        text: "Clustering experiment"
+      - text: Data and geometry
+        menu:
+          - href: case38.qmd  
+            text: "Isère (38)"   
+          - href: case49.qmd  
+            text: "Maine-et-Loire (49)"  
+          - href: case80.qmd  
+            text: "Somme (80)"               
+          - href: case94.qmd  
+            text: "Val-de-Marne (94)"
+      - text: Gerrymandering
+        menu:
+          - href: gerry94.qmd  
+            text: "Val-de-Marne"   
+          - href: gerry80.qmd  
+            text: "Somme"              
+          - href: gerry38.qmd  
+            text: "Isère"              
+      - text: Redistricting ?
+        menu:
+          - href: exp001.qmd  
+            text: "k-means in demographic space"              
     right: 
       - icon: github # add icons as navbar buttons
         href: https://github.com/worldregio/SMA
         target: _blank
   page-footer:
     background: dark
-    left: Copyright 2025, Claude Grasland
+    left: Copyright 2026, Claude Grasland, ANR Project REDEC
 format:
   html:
     theme: 
