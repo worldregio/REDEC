@@ -1,5 +1,5 @@
 ---
-title: "Partisan bias & Gerrymandering "
+title: "Visualisation tool"
 subtitle: "The case of Isère (38)"
 author: "Claude Grasland"
 format: 
@@ -23,29 +23,41 @@ library(adespatial)
 
 
 
-The aim of this note is to examine the problem of delineation of circonscription in the département of Isère (38) characterized by strong geographical constraint, unequal density and gread diversity of political orientations. We will focus in particular in the analysis of the southern part of the département around the agglomeration of Grenoble and the mountain valleys around it.
-
-# DELINEATION OF CIRCONSCRIPTION
-
-## Geometric space
-
 ```{r}
 mydep <- "38"
 mynomdep <-"Isère"
+capnom <- "Grenoble"
+capcode <- "38185"
 
 
 
 bv1<-readRDS(paste0("map/bv",mydep,"/mapbv_voronoi.RDS")) %>% st_transform(2154)
 ci1 <-readRDS(paste0("map/bv",mydep,"/mapcir_voronoi.RDS")) %>% st_transform(2154)
+cap1 <- bv1 %>%filter(comcode==capcode) %>% group_by(comcode,comname) %>% summarise()
 bv2<-readRDS(paste0("map/bv",mydep,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
 ci2 <-readRDS(paste0("map/bv",mydep,"/mapcir_inscrits.RDS")) %>% st_transform(2154)
-  ci2 <-st_buffer(ci2,10)
+ci2 <-st_buffer(ci2,10)
+cap2 <- bv2 %>% filter(comcode==capcode)  %>% group_by(comcode, comname) %>% summarise()
+
+```
+
+
+# Area and population
+
+We propose to visualize the delineation of circonscription with two complementary maps.
+
+## Geometric space
+
+We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.
+
+```{r}
 
 par(mfrow=c(1,1))
 
 ## Geographic space
 bv<-bv1
 ci<-ci1
+ca<-cap1
 
   nbc<-dim(ci)[1]
   bv$Num <- substr(bv$circode,3,4)
@@ -58,6 +70,8 @@ ci<-ci1
          border="gray30",
          lwd=0.2)
   mf_map(ci, type="base",col=NA,lwd=2,border="black", add=T)
+    mf_map(ca, type="base", col=NA,lwd=2, border="red", add=T,lty=3)
+    mf_label(ca,var="comname", col="red", halo=T)
 
     mf_layout("Area in geometric space",
           frame=T,
@@ -72,11 +86,13 @@ Author : Grasland C., 2026, Preparation of  ANR REDEC")
 
 ## Demographic space
 
+We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance).
 
 ```{r}
 ## Geographic space
 bv<-bv2
 ci<-ci2
+ca<-cap2
 
   ci <-st_buffer(ci,10)
   nbc<-dim(ci)[1]
@@ -91,7 +107,8 @@ ci<-ci2
          lwd=0.2)
   mf_map(ci, type="base",col=NA,lwd=2,border="black", add=T)
   
-  
+    mf_map(ca, type="base", col=NA,lwd=2, border="red", add=T,lty=3)
+    mf_label(ca,var="comname", col="red", halo=T)
 
     mf_layout("Population in demographic space",
           frame=T,
@@ -102,27 +119,29 @@ Author : Grasland C., 2026, Preparation of ANR REDEC")
     
 ```
 
-# PRESIDENTIAL ELECTION 2022 (first turn)
+# Political orientation
 
 The first turn of the presidential election of 2022 is characterized by the emergence of three blocks, represented by the candidates E. Macron (center right), J.L. Melenchon (left) and Marine Le Pen (far right).  It offers a good view of the political landscape before the parliament elections that follows.
 
-## In geometric space
-
-What is the distribution of choices by voting office and criconscription in geometric space ?
-
-```{r, fig.with=6, fig.height=15}
-bv<-bv1
-ci<-ci1
-par(mfrow=c(4,1))
-
-## Geographic space
 
 
-
-bv$x<-100*bv$Mac/bv$exp
-  mf_map(bv, type="choro",var="x", 
+```{r}
+mapchoro <-function(mybv=bv,
+                    myci=ci, 
+                    myvar="Mac", 
+                    myname="Macron",
+                    mypal="Oranges",
+                    mycred = "Author : Grasland C., 2026, Preparation of  ANR REDEC",
+                    myscale = T){
+  
+ bv<-mybv
+ ci<-myci
+ bv$x <-bv[[myvar]]
+bv$x<-100*bv$x/bv$exp
+  mf_map(bv, type="choro",
+         var="x", 
          breaks="q6",
-         pal="Oranges",
+         pal=mypal,
          alpha=0.6,
          leg_pos =  "topright", 
          leg_title = "% expr",
@@ -131,70 +150,31 @@ bv$x<-100*bv$Mac/bv$exp
          lwd=0.1)
   mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
 
-    mf_layout("Macron",
+    mf_layout(myname,
           frame=T,
-          scale=T,
+          scale=myscale,
           arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")   
-    
-    
-bv$x<-100*bv$Mel/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Reds",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr.",
-                  leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
+          credits = mycred)
+  
+}
 
-    mf_layout("Melenchon",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")   
-    
-    
-    
-bv$x<-100*bv$Lep/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Blues",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr.",
-                  leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
-
-    mf_layout("Le Pen",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")    
-    
-    
-bv$x<-100*(bv$exp - bv$Lep -bv$Mac - bv$Mel)/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Grays",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr.",
-         leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
-
-    mf_layout("Other candidates",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")     
    
+    
+```
+
+
+## In geometric space
+
+What is the distribution of choices by voting office and criconscription in geometric space ?
+
+```{r, fig.with=6, fig.height=15}
+
+par(mfrow=c(3,1))
+
+mapchoro(bv1,ci1,"Mac","Macron","Oranges")
+mapchoro(bv1,ci1,"Mel","Mélenchon","Reds")
+mapchoro(bv1,ci1,"Lep","Le Pen","Blues")
+
 
     
 ```
@@ -206,108 +186,43 @@ bv$x<-100*(bv$exp - bv$Lep -bv$Mac - bv$Mel)/bv$exp
 
 What is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote.
 
-```{r, fig.with=6, fig.height=15}
-bv<-bv2
-ci<-ci2
-par(mfrow=c(4,1))
+```{r, fig.with=6, fig.height=12}
+par(mfrow=c(3,1))
 
-## Geographic space
-
-
-
-bv$x<-100*bv$Mac/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Oranges",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr",
-                  leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
-
-    mf_layout("Macron",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")   
-    
-    
-bv$x<-100*bv$Mel/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Reds",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr.",
-                  leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
-
-    mf_layout("Melenchon",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")   
-    
-    
-    
-bv$x<-100*bv$Lep/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Blues",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr.",
-                  leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
-
-    mf_layout("Le Pen",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")    
-    
-    
-bv$x<-100*(bv$exp - bv$Lep -bv$Mac - bv$Mel)/bv$exp
-  mf_map(bv, type="choro",var="x", 
-         breaks="q6",
-         pal="Grays",
-         alpha=0.6,
-         leg_pos =  "topright", 
-         leg_title = "% expr.",
-         leg_val_rnd = 0,
-         border="gray30",
-         lwd=0.1)
-  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
-
-    mf_layout("Other candidates",
-          frame=T,
-          scale=T,
-          arrow=F,
-          credits = "Author : Grasland C., 2026, Preparation of  ANR REDEC")     
-   
-
-    
+mapchoro(bv2,ci2,"Mac","Macron","Oranges")
+mapchoro(bv2,ci2,"Mel","Mélenchon","Reds")
+mapchoro(bv2,ci2,"Lep","Le Pen","Blues")
 ```
 
-# GERRYMANDERING
+# Partisan bias ?
 
-We propose to appreciate the effect of gerrymandering and partisan bias on selected circonscription characterized either by a strange geometric form and/or by a strong  clustering of voices for one or several candidates arrived in first places at the presidential election of 2022. But we have to keep in mind that the clustering was not necessary the result of a "conspiration". But rather the inheritage of a long political history. 
+To what extent can be observe a partisan bias in the delineation of circonscription ? Do we observe specific concentration of votes in favour of one of the polical block in selected circonscriptions ? Can we suspect the existence of gerrymandering i.e. an intention to favour some political groups by methods of packing and cracking ?
 
-## Circonscription n°1
+The delineation of circonscription are inherited from an historical period where the main political division was an opposition between left and right. But with the existence of three poles (illustrated by the results of the vote for Macron, Mélenchon and Le Pen), the bias has been strongly modified.
+
 
 ```{r}
+mapnetwork <- function(mapbv = bv1,
+                       mapcir = ci1,
+                       mapca = cap1,
+                       cirnum = "3801",
+                       mytitle = "Geometric space",
+                       myscale = F,
+                      mycred = "",
+                      leg = TRUE
+                       ) {
+  
+  
+ #mapbv <- bv1
+ #mapcir <- ci1
+# cirnum <- "3801" 
+  
+bv<-mapbv
+cir <-mapcir
+ca <-mapca
 
-par(mfrow=c(1,2))
-
-bv<-bv1
-
-mapdon <- bv %>% filter(circode=="3801")
+ mapdon <- bv %>% filter(circode==cirnum)
+ 
 
 # Calcul de la matrice de contiguïté
 mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
@@ -327,9 +242,6 @@ reg_links_contig  <- mf_get_links(x = mapdon,
                                   x_id = "bvocode", 
                                   df_id = c("Var1","Var2"))
 
-
-
-
 # Graphe de voisinage
 sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
   summarise() %>% st_buffer(10)
@@ -339,396 +251,40 @@ mf_map(mapdon, type="base", col="gray90", border=NA)
 
 mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
 #mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
+if (leg==T) {
 mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Geometric space", credits = "", arrow=F, frame=T)
+} else {
+mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_pos=c(NA,NA))  
+  
+}
+mf_map(ca, type="base",col=NA,border="black", add=T, lwd=2, lty=3)
+#mf_label(ca, var = capnom, col="blue", halo=T)
+mf_layout(title = paste(cirnum, ":", mytitle), credits = "", arrow=F, frame=T, scale=myscale)
 
 
-bv<-bv2
+}
 
-mapdon <- bv %>% filter(circode=="3801")
 
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
 
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"),leg_pos = c(NA,NA))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Demographic space", credits = "", arrow=F, frame=T, scale=F)
-
-```
-
-## Circonscription n°2
-
-```{r}
-
-par(mfrow=c(1,2))
-
-bv<-bv1
-
-mapdon <- bv %>% filter(circode=="3802")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Geometric space", credits = "", arrow=F, frame=T)
-
-
-bv<-bv2
-
-mapdon <- bv %>% filter(circode=="3802")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"),leg_pos = c(NA,NA))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Demographic space", credits = "", arrow=F, frame=T, scale=F)
-
-```
-
-
-## Circonscription n°3
-
-```{r}
-
-par(mfrow=c(1,2))
-
-bv<-bv1
-
-mapdon <- bv %>% filter(circode=="3803")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Geometric space", credits = "", arrow=F, frame=T)
-
-
-bv<-bv2
-
-mapdon <- bv %>% filter(circode=="3803")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"),leg_pos = c(NA,NA))
-
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Demographic space", credits = "", arrow=F, frame=T, scale=F)
 
 ```
 
 
 
-## Circonscription n°4
 
-```{r}
+```{r, fig.height=30, fig.width=8}
 
-par(mfrow=c(1,2))
+listcode<-ci$circode
+nb<-length(listcode)
+par(mfrow=c(nb,2))
+for(i in 1:nb) {
+mapnetwork(mapbv = bv1,mapcir = ci1,mapca = cap1,cirnum = listcode[i], "Geometric space", leg=T)
+mapnetwork(mapbv = bv2,mapcir = ci2, mapca = cap2,cirnum = listcode[i], "Demographic space", leg=F)
+}
 
-bv<-bv1
-
-mapdon <- bv %>% filter(circode=="3804")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Geometric space", credits = "", arrow=F, frame=T)
-
-
-bv<-bv2
-
-mapdon <- bv %>% filter(circode=="3804")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"),leg_pos = c(NA,NA))
-
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Demographic space", credits = "", arrow=F, frame=T, scale=F)
 
 ```
 
-## Circonscription n°5
-
-```{r}
-
-par(mfrow=c(1,2))
-
-bv<-bv1
-
-mapdon <- bv %>% filter(circode=="3805")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
 
 
 
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"))
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Geometric space", credits = "", arrow=F, frame=T)
-
-
-bv<-bv2
-
-mapdon <- bv %>% filter(circode=="3805")
-
-# Calcul de la matrice de contiguïté
-mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
-colnames(mat_conti) <- mapdon$bvocode
-rownames(mat_conti) <- mapdon$bvocode
-
-# Suppression de la moitié de la matrice (et de la diagonale)
-mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
-
-# Construction d'un tableau de lien (i, j) de contiguïté
-reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
-  filter(contig == TRUE)
-
-# Création de la couche géographique de liens
-reg_links_contig  <- mf_get_links(x = mapdon, 
-                                  df = reg_link_contig, 
-                                  x_id = "bvocode", 
-                                  df_id = c("Var1","Var2"))
-
-
-
-
-# Graphe de voisinage
-sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
-  summarise() %>% st_buffer(10)
-
-mf_map(mapdon, type="base", col="gray90", border=NA)
-#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
-
-mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
-
-#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
-mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"),leg_pos = c(NA,NA))
-
-#mf_map(Amcont, type="bv",col=NA,border="red", add=T)
-mf_layout("Demographic space", credits = "", arrow=F, frame=T, scale=F)
-
-```

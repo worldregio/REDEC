@@ -7,7 +7,7 @@ website:
     left:
       - href: index.qmd
         text: "Home"
-      - text: Data and geometry
+      - text: Geomatic backoffice
         menu:
           - href: case38.qmd  
             text: "Isère (38)"   
@@ -17,15 +17,17 @@ website:
             text: "Somme (80)"               
           - href: case94.qmd  
             text: "Val-de-Marne (94)"
-      - text: Gerrymandering
+      - text: Visualization tools
         menu:
-          - href: gerry94.qmd  
-            text: "Val-de-Marne"   
-          - href: gerry80.qmd  
-            text: "Somme"              
           - href: gerry38.qmd  
-            text: "Isère"              
-      - text: Redistricting ?
+            text: "Isère (38)"   
+          - href: gerry49.qmd  
+            text: "Maine-et-Loire (49)"  
+          - href: gerry80.qmd  
+            text: "Somme (80)"               
+          - href: gerry94.qmd  
+            text: "Val-de-Marne (94)"           
+      - text: Redistricting methods
         menu:
           - href: exp001.qmd  
             text: "k-means in demographic space"              

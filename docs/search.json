@@ -65,93 +65,219 @@
   {
     "objectID": "gerry80.html",
     "href": "gerry80.html",
-    "title": "Partisan bias & Gerrymandering",
+    "title": "Visualisation tool",
     "section": "",
-    "text": "The aim of this note is to examine a spectacular case of partisan bias and gerrymandering in the département of Somme (80)."
+    "text": "We propose to visualize the delineation of circonscription with two complementary maps.\n\n\nWe use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.\n\n\n\n\n\n\n\n\n\n\n\n\nWe use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
   },
   {
     "objectID": "gerry80.html#geometric-space",
     "href": "gerry80.html#geometric-space",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Geometric space",
-    "text": "Geometric space"
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area."
   },
   {
     "objectID": "gerry80.html#demographic-space",
     "href": "gerry80.html#demographic-space",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Demographic space",
-    "text": "Demographic space"
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
   },
   {
     "objectID": "gerry80.html#in-geometric-space",
     "href": "gerry80.html#in-geometric-space",
-    "title": "Partisan bias & Gerrymandering",
+    "title": "Visualisation tool",
     "section": "In geometric space",
     "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
   },
   {
     "objectID": "gerry80.html#in-demographic-space",
     "href": "gerry80.html#in-demographic-space",
-    "title": "Partisan bias & Gerrymandering",
+    "title": "Visualisation tool",
     "section": "In demographic space",
     "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
   },
   {
-    "objectID": "gerry80.html#circonscription-n1",
-    "href": "gerry80.html#circonscription-n1",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°1",
-    "text": "Circonscription n°1"
-  },
-  {
-    "objectID": "gerry80.html#circonscription-n2",
-    "href": "gerry80.html#circonscription-n2",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°2",
-    "text": "Circonscription n°2"
-  },
-  {
-    "objectID": "gerry80.html#circonscription-n4",
-    "href": "gerry80.html#circonscription-n4",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°4",
-    "text": "Circonscription n°4"
-  },
-  {
-    "objectID": "gerry80.html#the-commune-of-amiens",
-    "href": "gerry80.html#the-commune-of-amiens",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "The commune of Amiens",
-    "text": "The commune of Amiens\nThe commune of Amiens is splitted in two circonscription, despite the fact that its population would perfectly fit with the creation of a single one. It is therefore interesting to examine what would be the form and political orientation of this virtual poltical unit."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "REDEC",
+    "objectID": "gerry49.html",
+    "href": "gerry49.html",
+    "title": "Visualisation tool",
     "section": "",
-    "text": "This github directory is used for cartographic experiments in relation with the submission of the REDEC project to the AAPG 2026 of the ANR. We will more precisely focus onthe analysis of four cases studies related to the département of Isère, Maine-et-Loire, Somme and Val-de-Marne."
+    "text": "We propose to visualize the delineation of circonscription with two complementary maps.\n\n\nWe use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.\n\n\n\n\n\n\n\n\n\n\n\n\nWe use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
   },
   {
-    "objectID": "index.html#selection-of-cases-studies",
-    "href": "index.html#selection-of-cases-studies",
-    "title": "REDEC",
-    "section": "Selection of cases studies",
-    "text": "Selection of cases studies\nFour département has been carefully chosen as places of experiment of the different methods and concepts developed in previous work packages. These four case studies will be used ex-ante in order to test methods and concepts that will be further applied to the whole territory of France. They will also be used ex-post as proof of concept for researcher and decision maker. And finally they will be used as test for the research of the best way to disseminate the results toward stakeholders and citizens. To achieve this objectives, the four cases studies has been chosen in order to represent both geographical complexity and political diversity of situations :\n– Val-de-Marne (94) is a metropolitan département located in the suburb of Paris with a very high population density concentrated in very few communes which implies necessarily to break some of them in order to have equal population size in cantons. The political opinion is characterized by equivalent proportion of votes for left and center-right but very few votes for far-right.\n– Isère (38) offers the case of a département which combines very strong geographical and political differences. The density of population is very high in the metropolitan agglomeration of Grenoble and the related valleys but very low in mountains area. The political diversity is complete with far-right in the north, far-left in the suburb of Grenoble and center-left or center right elsewhere.\n– Somme (80) is a good example of rural and industrial area that has been exposed to economic crisis and has recently offers a majority of vote to far-right, with the exception of the capital city of Amiens. Furthermore, the strange shape of some of its districts raises questions. It is also a remarkable case of gerrymandering with three strange circonscriptions having the form of an octopus (n°4) and a salamander (n°1) surrounding a frog (n°2) …\n– Maine-et-Loire (49) located in the Western part of France is the opposite example of Somme in political terms as it remains a typical area or resistance of center-right or center-left.It is also characterized by an interesting administrative evolution with a strong reduction of the number of communes by merging (Bideau 2024). We arrive at a moment where some cluster of rural communes are larger than cantons."
+    "objectID": "gerry49.html#geometric-space",
+    "href": "gerry49.html#geometric-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area."
   },
   {
-    "objectID": "index.html#data-collection",
-    "href": "index.html#data-collection",
-    "title": "REDEC",
-    "section": "Data collection",
-    "text": "Data collection\nWe will firstly examine which data can be collected and combine at different levels in each of the selected area."
+    "objectID": "gerry49.html#demographic-space",
+    "href": "gerry49.html#demographic-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
   },
   {
-    "objectID": "index.html#experiments",
-    "href": "index.html#experiments",
-    "title": "REDEC",
-    "section": "Experiments",
-    "text": "Experiments\nWe will then realize preliminary experiments of redisctricting applied to the electoral circonscription. The objective will be to compare the current offcial division against alternative proposals."
+    "objectID": "gerry49.html#in-geometric-space",
+    "href": "gerry49.html#in-geometric-space",
+    "title": "Visualisation tool",
+    "section": "In geometric space",
+    "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
+  },
+  {
+    "objectID": "gerry49.html#in-demographic-space",
+    "href": "gerry49.html#in-demographic-space",
+    "title": "Visualisation tool",
+    "section": "In demographic space",
+    "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
+  },
+  {
+    "objectID": "case94.html",
+    "href": "case94.html",
+    "title": "Geomatic database of REDEC project",
+    "section": "",
+    "text": "Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE\nThe aim of this note is to examine the different statistical and cartographical sources of interest for the objectives of the REDEC project."
+  },
+  {
+    "objectID": "case94.html#the-map-of-insee",
+    "href": "case94.html#the-map-of-insee",
+    "title": "Geomatic database of REDEC project",
+    "section": "The map of INSEE",
+    "text": "The map of INSEE\nThe geometry of voting offices has been made available only very recently by INSEE through an automatic recognition of the location of adresses on listings (INSEE, 2023, Proposition de contour des bureaux de vote). The raw map offers a complete coverage of the territory of the departement :\n\n\n\n\n\n\n\n\n\nThe geometry of map is relatively simple in rural areas where voting offices correspond to the geometry of a commune or an aggregate of communes. But situation is more complex in urban areas."
+  },
+  {
+    "objectID": "case94.html#generalisation-of-the-map",
+    "href": "case94.html#generalisation-of-the-map",
+    "title": "Geomatic database of REDEC project",
+    "section": "Generalisation of the map",
+    "text": "Generalisation of the map\nWe have created a simplified map using Voronoï triangulation applied to the geometric center of the area covered by voting offices. As a consequence, some details are lost but the map become more easy to use for topological and spatial analysis."
+  },
+  {
+    "objectID": "case94.html#cartogram-transformation",
+    "href": "case94.html#cartogram-transformation",
+    "title": "Geomatic database of REDEC project",
+    "section": "Cartogram transformation",
+    "text": "Cartogram transformation\nAs we are interested in election, we realize a third version of the map of voting officies where the area is made proportional to the number of registred people (inscrits). We use the presidential election of 2022 as reference."
+  },
+  {
+    "objectID": "case94.html#voting-offices-1",
+    "href": "case94.html#voting-offices-1",
+    "title": "Geomatic database of REDEC project",
+    "section": "1. Voting offices",
+    "text": "1. Voting offices"
+  },
+  {
+    "objectID": "case94.html#communes",
+    "href": "case94.html#communes",
+    "title": "Geomatic database of REDEC project",
+    "section": "2. Communes",
+    "text": "2. Communes"
+  },
+  {
+    "objectID": "case94.html#cantons",
+    "href": "case94.html#cantons",
+    "title": "Geomatic database of REDEC project",
+    "section": "3. Cantons",
+    "text": "3. Cantons"
+  },
+  {
+    "objectID": "case94.html#circonscriptions",
+    "href": "case94.html#circonscriptions",
+    "title": "Geomatic database of REDEC project",
+    "section": "4. Circonscriptions",
+    "text": "4. Circonscriptions"
+  },
+  {
+    "objectID": "case94.html#filosofi-2021",
+    "href": "case94.html#filosofi-2021",
+    "title": "Geomatic database of REDEC project",
+    "section": "Filosofi 2021",
+    "text": "Filosofi 2021\nThe INSEE grid of population Filosofi at the resolution of 200m x 200m has been published in 2021 with a set of 30 indicators describing the population by age and sex and some economic and social indicator derived from census like the median income of the houshold, the share of social housing, etc. This resolution of 200m is generally sufficient to charactrize the situation of voting office, even if some approximation is requested in central urban area. As an example, here is the distribution of voting office and grid data inthe capital city of the département.\n\n\nWarning: st_centroid assumes attributes are constant over geometries"
+  },
+  {
+    "objectID": "exp001.html",
+    "href": "exp001.html",
+    "title": "K-means clustering in demographic space",
+    "section": "",
+    "text": "Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE\n\n\n\nAttaching package: 'dplyr'\n\n\nThe following objects are masked from 'package:stats':\n\n    filter, lag\n\n\nThe following objects are masked from 'package:base':\n\n    intersect, setdiff, setequal, union"
+  },
+  {
+    "objectID": "exp001.html#objective",
+    "href": "exp001.html#objective",
+    "title": "K-means clustering in demographic space",
+    "section": "Objective",
+    "text": "Objective\nThe aim of this note is to experiment methods of classification with population and euclidean distance constraint. They don not fulfill necessarily the contiguity constraint but offers some interesting results for discussion"
+  },
+  {
+    "objectID": "exp001.html#the-official-division-in-11-districts",
+    "href": "exp001.html#the-official-division-in-11-districts",
+    "title": "K-means clustering in demographic space",
+    "section": "1. The official division in 11 districts",
+    "text": "1. The official division in 11 districts\nWe remind the spatial organisation of the 11 electoral circonscriptions of the Val de Marne that has been described in the previous analysis\n\n\n\n\n\n\n\n\n\nUsing the number of inscrits as criterium, we can see that the average size of circonscription should be :\n\n\n[1] \"Number of inscrits :  795960\"\n\n\n[1] \"Number of circonscriptions : 11\"\n\n\n[1] \"Ideal size :  72360\"\n\n\n[1] \"Margin with + or - 10% : [ 65124 ; 79596 ]\"\n\n\nWe can check the deviation to average in 2022 for the number of registered (inscrits), voting (votants) and voting for a candidate (exprimés) :\n\n\n\n\n\ncircode\nins\nInscrits_dev\n\n\n\n\n9401\n84314\n16.5\n\n\n9402\n64989\n-10.2\n\n\n9403\n73200\n1.2\n\n\n9404\n73434\n1.5\n\n\n9405\n89753\n24.0\n\n\n9406\n81755\n13.0\n\n\n9407\n65949\n-8.9\n\n\n9408\n77989\n7.8\n\n\n9409\n53579\n-26.0\n\n\n9410\n66555\n-8.0\n\n\n9411\n64443\n-10.9\n\n\n\n\n\n\nComment :  We can notice very strong deviations to the average size, whatever the criteria used. If we use the legal criterium of people allowed to vote (registered) the extreme situation are observed in circonscription 9 with only 53579 inscrits (-26%) and the opposite case in circonscription 5 with 89753 inscrits (+ 24%)"
+  },
+  {
+    "objectID": "exp001.html#an-heursitic-division-based-on-communes",
+    "href": "exp001.html#an-heursitic-division-based-on-communes",
+    "title": "K-means clustering in demographic space",
+    "section": "2. An heursitic division based on communes",
+    "text": "2. An heursitic division based on communes\nCan we use the commune as building blocks ?\n\n\n\n\n\ncomname\nInscrits\n\n\n\n\nSaint-Maur-des-Fossés\n50466\n\n\nCréteil\n46430\n\n\nVitry-sur-Seine\n45843\n\n\nChampigny-sur-Marne\n42977\n\n\nMaisons-Alfort\n36908\n\n\nFontenay-sous-Bois\n33361\n\n\n\n\n\nAt first glance, it seems to be possible because none of the commune has a number of inscrits higher than the upper limit of size. If we consider the topology of the location of big and small communes, it appears that some aggregation of communes are obvious, like in the northern part of the Bois de Vincennes (StMandé + Vincennes + Fontenay-sous-Bois)\n\n\n\n\n\n\n\n\n\nWe have elaborated an heuristic division which try to elaborate 11 circonscriptions of approximaively equal size without any partition ocf communes.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\npart\nInscrits\nInscrits_dev\n\n\n\n\n01\n72847\n0.7\n\n\n02\n75657\n4.6\n\n\n03\n74826\n3.4\n\n\n04\n72028\n-0.5\n\n\n05\n74245\n2.6\n\n\n06\n81755\n13.0\n\n\n07\n65599\n-9.3\n\n\n08\n65022\n-10.1\n\n\n09\n70370\n-2.8\n\n\n10\n75809\n4.8\n\n\n11\n67802\n-6.3\n\n\n\n\n\nAs we can see the result is better than the official division in terms of equal number of inscrits. Th minimum is 65022 (-10.1% of target) and the maximum 81755 (+13% of target). We can therefore really ask why the rule of the game was to use cantons and to allow the splitting of communes …"
+  },
+  {
+    "objectID": "exp001.html#k-means-applied-to-voting-office-with-demographic-distance",
+    "href": "exp001.html#k-means-applied-to-voting-office-with-demographic-distance",
+    "title": "K-means clustering in demographic space",
+    "section": "3. k-means applied to voting office with demographic distance",
+    "text": "3. k-means applied to voting office with demographic distance\nSuppose now that we use as initial building blocks the division in 804 voting offices, withour considering the limits of communes as a constraint. In the case of Val-de-Marne, the size of voting office is very regular because each commune has a sufficient population to have several voting office.And we can suppose that their maximum size is defined by the law.\n\n\n`stat_bin()` using `bins = 30`. Pick better value `binwidth`.\n\n\n\n\n\n\n\n\n\nWe use it a map where the geometry has been transformed in order tomake the area proportional to the number of registred people (inscrits). It is therefoer a demographic space whee the distance between two point is not a number of kilometers but a number of people. What is called by the sociologist Samuel Stouffer (1942) an amount of intervening opportunities.\n\n\n\n\n\n\n\n\n\nThe coordinates in this demographic space to benefit from some interesting properties and make possible to use existing algorithm of classification. We can for example use classification methods based on distance like k-means without constraint and examine the results of clustering for 11 circonscriptions\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\n\n\n\n\n\n\n\nAs we can see, the introduction of euclidean distance in demographic space has produced cluster that fulfill generally the condition of contiguity except in one case. The resulting partition is also relatively equal in terms of number of inscrits, except when the border is complex like inthe northern part arount the Bois de Voncennes.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCIRC\nnbunit\nnbinscrits\nindex\n\n\n\n\n7\n59\n54522\n75.3\n\n\n8\n56\n59812\n82.7\n\n\n5\n67\n62765\n86.7\n\n\n6\n65\n66877\n92.4\n\n\n11\n72\n71565\n98.9\n\n\n1\n69\n73288\n101.3\n\n\n4\n81\n76936\n106.3\n\n\n3\n77\n77078\n106.5\n\n\n10\n83\n79412\n109.7\n\n\n9\n80\n84219\n116.4\n\n\n2\n95\n89486\n123.7\n\n\n\n\n\nThe resulting division is less optimal than the heuristic aggregation of communes. But no very different from the official one, with a minimum of 47612 (-34%) and a maximum of 87191 (+21%)"
+  },
+  {
+    "objectID": "exp001.html#k-means-in-demographic-space-with-equal-size-constraint",
+    "href": "exp001.html#k-means-in-demographic-space-with-equal-size-constraint",
+    "title": "K-means clustering in demographic space",
+    "section": "4. K-means in demographic space with equal size constraint",
+    "text": "4. K-means in demographic space with equal size constraint\nSome authors has developped methods that take into account a constraint of equal size of cluster. As an example we have use the function balanced_cluster() of the package anticluster which make possible to obtain cluster with exacly the same number of individuals. Unfortunately the authors of the package has decided that “exactly means exactly” … which means that we are obliged to “cheat” our data if the number of units can not be divided by the number of expected cluster … In our example, we have 804 units to be divided in 11 circonscription and the program does not work as it can not be divided by 11 without decimal. But if we aggregate only two offices with their neighbors, we arrive at 803 units which can be divided by 11 \\(803/11 ==73\\)\nThe algorithm will produce circonscriptions with the same number of voting office. And as the voting office has generally equivalent size, the result will be approximatively equivalent when we aggregate.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCIRC2\nnbunit\nnbinscrits\nindex\n\n\n\n\n2\n72\n65252\n90.2\n\n\n6\n73\n68769\n95.0\n\n\n5\n73\n69147\n95.6\n\n\n4\n73\n70562\n97.5\n\n\n1\n73\n71667\n99.0\n\n\n3\n74\n71954\n99.4\n\n\n10\n73\n72137\n99.7\n\n\n7\n73\n73955\n102.2\n\n\n9\n73\n76896\n106.3\n\n\n8\n73\n77533\n107.1\n\n\n11\n74\n78088\n107.9\n\n\n\n\n\nWe obtain here the best partition with a minimum of 66691 (-7.8%) and a maximum of 79299 (+ 9.6%). Our objective to avoid a variation lower or greater than 10 % as compared to the target is fullfiled !"
+  },
+  {
+    "objectID": "exp001.html#discussion",
+    "href": "exp001.html#discussion",
+    "title": "K-means clustering in demographic space",
+    "section": "Discussion",
+    "text": "Discussion\nThis analysis confirms that the legal obligation to build circonscription has aggregates of communes limits the possibility to reach optimal solutions and create a legal confusion between two elections. The cantons are instrument of local elections (département) when circonscription are instrument of national elections. Using the voting office as building blocks would be more logical if we admit that a member of the parliament is not defending a local area but elabrating national policy …"
+  },
+  {
+    "objectID": "gerry38.html",
+    "href": "gerry38.html",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We propose to visualize the delineation of circonscription with two complementary maps.\n\n\nWe use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.\n\n\n\n\n\n\n\n\n\n\n\n\nWe use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
+  },
+  {
+    "objectID": "gerry38.html#geometric-space",
+    "href": "gerry38.html#geometric-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area."
+  },
+  {
+    "objectID": "gerry38.html#demographic-space",
+    "href": "gerry38.html#demographic-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
+  },
+  {
+    "objectID": "gerry38.html#in-geometric-space",
+    "href": "gerry38.html#in-geometric-space",
+    "title": "Visualisation tool",
+    "section": "In geometric space",
+    "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
+  },
+  {
+    "objectID": "gerry38.html#in-demographic-space",
+    "href": "gerry38.html#in-demographic-space",
+    "title": "Visualisation tool",
+    "section": "In demographic space",
+    "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
   },
   {
     "objectID": "case80.html",
@@ -217,186 +343,32 @@
     "text": "Filosofi 2021\nThe INSEE grid of population Filosofi at the resolution of 200m x 200m has been published in 2021 with a set of 30 indicators describing the population by age and sex and some economic and social indicator derived from census like the median income of the houshold, the share of social housing, etc. This resolution of 200m is generally sufficient to charactrize the situation of voting office, even if some approximation is requested in central urban area. As an example, here is the distribution of voting office and grid data inthe capital city of the département.\n\n\nWarning: st_centroid assumes attributes are constant over geometries"
   },
   {
-    "objectID": "gerry38.html",
-    "href": "gerry38.html",
-    "title": "Partisan bias & Gerrymandering",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "REDEC",
     "section": "",
-    "text": "The aim of this note is to examine the problem of delineation of circonscription in the département of Isère (38) characterized by strong geographical constraint, unequal density and gread diversity of political orientations. We will focus in particular in the analysis of the southern part of the département around the agglomeration of Grenoble and the mountain valleys around it."
+    "text": "This github directory is used for cartographic experiments in relation with the submission of the REDEC project to the AAPG 2026 of the ANR. We will more precisely focus onthe analysis of four cases studies related to the département of Isère, Maine-et-Loire, Somme and Val-de-Marne."
   },
   {
-    "objectID": "gerry38.html#geometric-space",
-    "href": "gerry38.html#geometric-space",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Geometric space",
-    "text": "Geometric space"
+    "objectID": "index.html#selection-of-cases-studies",
+    "href": "index.html#selection-of-cases-studies",
+    "title": "REDEC",
+    "section": "Selection of cases studies",
+    "text": "Selection of cases studies\nFour département has been carefully chosen as places of experiment of the different methods and concepts developed in previous work packages. These four case studies will be used ex-ante in order to test methods and concepts that will be further applied to the whole territory of France. They will also be used ex-post as proof of concept for researcher and decision maker. And finally they will be used as test for the research of the best way to disseminate the results toward stakeholders and citizens. To achieve this objectives, the four cases studies has been chosen in order to represent both geographical complexity and political diversity of situations :\n– Val-de-Marne (94) is a metropolitan département located in the suburb of Paris with a very high population density concentrated in very few communes which implies necessarily to break some of them in order to have equal population size in cantons. The political opinion is characterized by equivalent proportion of votes for left and center-right but very few votes for far-right.\n– Isère (38) offers the case of a département which combines very strong geographical and political differences. The density of population is very high in the metropolitan agglomeration of Grenoble and the related valleys but very low in mountains area. The political diversity is complete with far-right in the north, far-left in the suburb of Grenoble and center-left or center right elsewhere.\n– Somme (80) is a good example of rural and industrial area that has been exposed to economic crisis and has recently offers a majority of vote to far-right, with the exception of the capital city of Amiens. Furthermore, the strange shape of some of its districts raises questions. It is also a remarkable case of gerrymandering with three strange circonscriptions having the form of an octopus (n°4) and a salamander (n°1) surrounding a frog (n°2) …\n– Maine-et-Loire (49) located in the Western part of France is the opposite example of Somme in political terms as it remains a typical area or resistance of center-right or center-left.It is also characterized by an interesting administrative evolution with a strong reduction of the number of communes by merging (Bideau 2024). We arrive at a moment where some cluster of rural communes are larger than cantons."
   },
   {
-    "objectID": "gerry38.html#demographic-space",
-    "href": "gerry38.html#demographic-space",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Demographic space",
-    "text": "Demographic space"
+    "objectID": "index.html#data-collection",
+    "href": "index.html#data-collection",
+    "title": "REDEC",
+    "section": "Data collection",
+    "text": "Data collection\nWe will firstly examine which data can be collected and combine at different levels in each of the selected area."
   },
   {
-    "objectID": "gerry38.html#in-geometric-space",
-    "href": "gerry38.html#in-geometric-space",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "In geometric space",
-    "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
-  },
-  {
-    "objectID": "gerry38.html#in-demographic-space",
-    "href": "gerry38.html#in-demographic-space",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "In demographic space",
-    "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
-  },
-  {
-    "objectID": "gerry38.html#circonscription-n1",
-    "href": "gerry38.html#circonscription-n1",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°1",
-    "text": "Circonscription n°1"
-  },
-  {
-    "objectID": "gerry38.html#circonscription-n2",
-    "href": "gerry38.html#circonscription-n2",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°2",
-    "text": "Circonscription n°2"
-  },
-  {
-    "objectID": "gerry38.html#circonscription-n3",
-    "href": "gerry38.html#circonscription-n3",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°3",
-    "text": "Circonscription n°3"
-  },
-  {
-    "objectID": "gerry38.html#circonscription-n4",
-    "href": "gerry38.html#circonscription-n4",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°4",
-    "text": "Circonscription n°4"
-  },
-  {
-    "objectID": "gerry38.html#circonscription-n5",
-    "href": "gerry38.html#circonscription-n5",
-    "title": "Partisan bias & Gerrymandering",
-    "section": "Circonscription n°5",
-    "text": "Circonscription n°5"
-  },
-  {
-    "objectID": "exp001.html",
-    "href": "exp001.html",
-    "title": "K-means clustering in demographic space",
-    "section": "",
-    "text": "Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE\n\n\n\nAttaching package: 'dplyr'\n\n\nThe following objects are masked from 'package:stats':\n\n    filter, lag\n\n\nThe following objects are masked from 'package:base':\n\n    intersect, setdiff, setequal, union"
-  },
-  {
-    "objectID": "exp001.html#objective",
-    "href": "exp001.html#objective",
-    "title": "K-means clustering in demographic space",
-    "section": "Objective",
-    "text": "Objective\nThe aim of this note is to experiment methods of classification with population and euclidean distance constraint. They don not fulfill necessarily the contiguity constraint but offers some interesting results for discussion"
-  },
-  {
-    "objectID": "exp001.html#the-official-division-in-11-districts",
-    "href": "exp001.html#the-official-division-in-11-districts",
-    "title": "K-means clustering in demographic space",
-    "section": "1. The official division in 11 districts",
-    "text": "1. The official division in 11 districts\nWe remind the spatial organisation of the 11 electoral circonscriptions of the Val de Marne that has been described in the previous analysis\n\n\n\n\n\n\n\n\n\nUsing the number of inscrits as criterium, we can see that the average size of circonscription should be :\n\n\n[1] \"Number of inscrits :  795960\"\n\n\n[1] \"Number of circonscriptions : 11\"\n\n\n[1] \"Ideal size :  72360\"\n\n\n[1] \"Margin with + or - 10% : [ 65124 ; 79596 ]\"\n\n\nWe can check the deviation to average in 2022 for the number of registered (inscrits), voting (votants) and voting for a candidate (exprimés) :\n\n\n\n\n\ncircode\nins\nInscrits_dev\n\n\n\n\n9401\n84314\n16.5\n\n\n9402\n64989\n-10.2\n\n\n9403\n73200\n1.2\n\n\n9404\n73434\n1.5\n\n\n9405\n89753\n24.0\n\n\n9406\n81755\n13.0\n\n\n9407\n65949\n-8.9\n\n\n9408\n77989\n7.8\n\n\n9409\n53579\n-26.0\n\n\n9410\n66555\n-8.0\n\n\n9411\n64443\n-10.9\n\n\n\n\n\n\nComment :  We can notice very strong deviations to the average size, whatever the criteria used. If we use the legal criterium of people allowed to vote (registered) the extreme situation are observed in circonscription 9 with only 53579 inscrits (-26%) and the opposite case in circonscription 5 with 89753 inscrits (+ 24%)"
-  },
-  {
-    "objectID": "exp001.html#an-heursitic-division-based-on-communes",
-    "href": "exp001.html#an-heursitic-division-based-on-communes",
-    "title": "K-means clustering in demographic space",
-    "section": "2. An heursitic division based on communes",
-    "text": "2. An heursitic division based on communes\nCan we use the commune as building blocks ?\n\n\n\n\n\ncomname\nInscrits\n\n\n\n\nSaint-Maur-des-Fossés\n50466\n\n\nCréteil\n46430\n\n\nVitry-sur-Seine\n45843\n\n\nChampigny-sur-Marne\n42977\n\n\nMaisons-Alfort\n36908\n\n\nFontenay-sous-Bois\n33361\n\n\n\n\n\nAt first glance, it seems to be possible because none of the commune has a number of inscrits higher than the upper limit of size. If we consider the topology of the location of big and small communes, it appears that some aggregation of communes are obvious, like in the northern part of the Bois de Vincennes (StMandé + Vincennes + Fontenay-sous-Bois)\n\n\n\n\n\n\n\n\n\nWe have elaborated an heuristic division which try to elaborate 11 circonscriptions of approximaively equal size without any partition ocf communes.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\npart\nInscrits\nInscrits_dev\n\n\n\n\n01\n72847\n0.7\n\n\n02\n75657\n4.6\n\n\n03\n74826\n3.4\n\n\n04\n72028\n-0.5\n\n\n05\n74245\n2.6\n\n\n06\n81755\n13.0\n\n\n07\n65599\n-9.3\n\n\n08\n65022\n-10.1\n\n\n09\n70370\n-2.8\n\n\n10\n75809\n4.8\n\n\n11\n67802\n-6.3\n\n\n\n\n\nAs we can see the result is better than the official division in terms of equal number of inscrits. Th minimum is 65022 (-10.1% of target) and the maximum 81755 (+13% of target). We can therefore really ask why the rule of the game was to use cantons and to allow the splitting of communes …"
-  },
-  {
-    "objectID": "exp001.html#k-means-applied-to-voting-office-with-demographic-distance",
-    "href": "exp001.html#k-means-applied-to-voting-office-with-demographic-distance",
-    "title": "K-means clustering in demographic space",
-    "section": "3. k-means applied to voting office with demographic distance",
-    "text": "3. k-means applied to voting office with demographic distance\nSuppose now that we use as initial building blocks the division in 804 voting offices, withour considering the limits of communes as a constraint. In the case of Val-de-Marne, the size of voting office is very regular because each commune has a sufficient population to have several voting office.And we can suppose that their maximum size is defined by the law.\n\n\n`stat_bin()` using `bins = 30`. Pick better value `binwidth`.\n\n\n\n\n\n\n\n\n\nWe use it a map where the geometry has been transformed in order tomake the area proportional to the number of registred people (inscrits). It is therefoer a demographic space whee the distance between two point is not a number of kilometers but a number of people. What is called by the sociologist Samuel Stouffer (1942) an amount of intervening opportunities.\n\n\n\n\n\n\n\n\n\nThe coordinates in this demographic space to benefit from some interesting properties and make possible to use existing algorithm of classification. We can for example use classification methods based on distance like k-means without constraint and examine the results of clustering for 11 circonscriptions\n\n\nWarning: st_centroid assumes attributes are constant over geometries\n\n\n\n\n\n\n\n\n\nAs we can see, the introduction of euclidean distance in demographic space has produced cluster that fulfill generally the condition of contiguity except in one case. The resulting partition is also relatively equal in terms of number of inscrits, except when the border is complex like inthe northern part arount the Bois de Voncennes.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCIRC\nnbunit\nnbinscrits\nindex\n\n\n\n\n7\n59\n54522\n75.3\n\n\n8\n56\n59812\n82.7\n\n\n5\n67\n62765\n86.7\n\n\n6\n65\n66877\n92.4\n\n\n11\n72\n71565\n98.9\n\n\n1\n69\n73288\n101.3\n\n\n4\n81\n76936\n106.3\n\n\n3\n77\n77078\n106.5\n\n\n10\n83\n79412\n109.7\n\n\n9\n80\n84219\n116.4\n\n\n2\n95\n89486\n123.7\n\n\n\n\n\nThe resulting division is less optimal than the heuristic aggregation of communes. But no very different from the official one, with a minimum of 47612 (-34%) and a maximum of 87191 (+21%)"
-  },
-  {
-    "objectID": "exp001.html#k-means-in-demographic-space-with-equal-size-constraint",
-    "href": "exp001.html#k-means-in-demographic-space-with-equal-size-constraint",
-    "title": "K-means clustering in demographic space",
-    "section": "4. K-means in demographic space with equal size constraint",
-    "text": "4. K-means in demographic space with equal size constraint\nSome authors has developped methods that take into account a constraint of equal size of cluster. As an example we have use the function balanced_cluster() of the package anticluster which make possible to obtain cluster with exacly the same number of individuals. Unfortunately the authors of the package has decided that “exactly means exactly” … which means that we are obliged to “cheat” our data if the number of units can not be divided by the number of expected cluster … In our example, we have 804 units to be divided in 11 circonscription and the program does not work as it can not be divided by 11 without decimal. But if we aggregate only two offices with their neighbors, we arrive at 803 units which can be divided by 11 \\(803/11 ==73\\)\nThe algorithm will produce circonscriptions with the same number of voting office. And as the voting office has generally equivalent size, the result will be approximatively equivalent when we aggregate.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCIRC2\nnbunit\nnbinscrits\nindex\n\n\n\n\n2\n72\n65252\n90.2\n\n\n6\n73\n68769\n95.0\n\n\n5\n73\n69147\n95.6\n\n\n4\n73\n70562\n97.5\n\n\n1\n73\n71667\n99.0\n\n\n3\n74\n71954\n99.4\n\n\n10\n73\n72137\n99.7\n\n\n7\n73\n73955\n102.2\n\n\n9\n73\n76896\n106.3\n\n\n8\n73\n77533\n107.1\n\n\n11\n74\n78088\n107.9\n\n\n\n\n\nWe obtain here the best partition with a minimum of 66691 (-7.8%) and a maximum of 79299 (+ 9.6%). Our objective to avoid a variation lower or greater than 10 % as compared to the target is fullfiled !"
-  },
-  {
-    "objectID": "exp001.html#discussion",
-    "href": "exp001.html#discussion",
-    "title": "K-means clustering in demographic space",
-    "section": "Discussion",
-    "text": "Discussion\nThis analysis confirms that the legal obligation to build circonscription has aggregates of communes limits the possibility to reach optimal solutions and create a legal confusion between two elections. The cantons are instrument of local elections (département) when circonscription are instrument of national elections. Using the voting office as building blocks would be more logical if we admit that a member of the parliament is not defending a local area but elabrating national policy …"
-  },
-  {
-    "objectID": "case94.html",
-    "href": "case94.html",
-    "title": "Geomatic database of REDEC project",
-    "section": "",
-    "text": "Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1; sf_use_s2() is TRUE\nThe aim of this note is to examine the different statistical and cartographical sources of interest for the objectives of the REDEC project."
-  },
-  {
-    "objectID": "case94.html#the-map-of-insee",
-    "href": "case94.html#the-map-of-insee",
-    "title": "Geomatic database of REDEC project",
-    "section": "The map of INSEE",
-    "text": "The map of INSEE\nThe geometry of voting offices has been made available only very recently by INSEE through an automatic recognition of the location of adresses on listings (INSEE, 2023, Proposition de contour des bureaux de vote). The raw map offers a complete coverage of the territory of the departement :\n\n\n\n\n\n\n\n\n\nThe geometry of map is relatively simple in rural areas where voting offices correspond to the geometry of a commune or an aggregate of communes. But situation is more complex in urban areas."
-  },
-  {
-    "objectID": "case94.html#generalisation-of-the-map",
-    "href": "case94.html#generalisation-of-the-map",
-    "title": "Geomatic database of REDEC project",
-    "section": "Generalisation of the map",
-    "text": "Generalisation of the map\nWe have created a simplified map using Voronoï triangulation applied to the geometric center of the area covered by voting offices. As a consequence, some details are lost but the map become more easy to use for topological and spatial analysis."
-  },
-  {
-    "objectID": "case94.html#cartogram-transformation",
-    "href": "case94.html#cartogram-transformation",
-    "title": "Geomatic database of REDEC project",
-    "section": "Cartogram transformation",
-    "text": "Cartogram transformation\nAs we are interested in election, we realize a third version of the map of voting officies where the area is made proportional to the number of registred people (inscrits). We use the presidential election of 2022 as reference."
-  },
-  {
-    "objectID": "case94.html#voting-offices-1",
-    "href": "case94.html#voting-offices-1",
-    "title": "Geomatic database of REDEC project",
-    "section": "1. Voting offices",
-    "text": "1. Voting offices"
-  },
-  {
-    "objectID": "case94.html#communes",
-    "href": "case94.html#communes",
-    "title": "Geomatic database of REDEC project",
-    "section": "2. Communes",
-    "text": "2. Communes"
-  },
-  {
-    "objectID": "case94.html#cantons",
-    "href": "case94.html#cantons",
-    "title": "Geomatic database of REDEC project",
-    "section": "3. Cantons",
-    "text": "3. Cantons"
-  },
-  {
-    "objectID": "case94.html#circonscriptions",
-    "href": "case94.html#circonscriptions",
-    "title": "Geomatic database of REDEC project",
-    "section": "4. Circonscriptions",
-    "text": "4. Circonscriptions"
-  },
-  {
-    "objectID": "case94.html#filosofi-2021",
-    "href": "case94.html#filosofi-2021",
-    "title": "Geomatic database of REDEC project",
-    "section": "Filosofi 2021",
-    "text": "Filosofi 2021\nThe INSEE grid of population Filosofi at the resolution of 200m x 200m has been published in 2021 with a set of 30 indicators describing the population by age and sex and some economic and social indicator derived from census like the median income of the houshold, the share of social housing, etc. This resolution of 200m is generally sufficient to charactrize the situation of voting office, even if some approximation is requested in central urban area. As an example, here is the distribution of voting office and grid data inthe capital city of the département.\n\n\nWarning: st_centroid assumes attributes are constant over geometries"
+    "objectID": "index.html#experiments",
+    "href": "index.html#experiments",
+    "title": "REDEC",
+    "section": "Experiments",
+    "text": "Experiments\nWe will then realize preliminary experiments of redisctricting applied to the electoral circonscription. The objective will be to compare the current offcial division against alternative proposals."
   },
   {
     "objectID": "case49.html",
@@ -464,43 +436,36 @@
   {
     "objectID": "gerry94.html",
     "href": "gerry94.html",
-    "title": "Scalar contradictions & gerrymandering",
+    "title": "Visualisation tool",
     "section": "",
-    "text": "The aim of this note is to examine some contradictions between the rule governing the electoral division and the current situation. We have chosen the département of Val-de-Marne as example because of this exceptional complexity in terms of contradictions between the different geographical divisions that should be used in the analysis"
+    "text": "We propose to visualize the delineation of circonscription with two complementary maps.\n\n\nWe use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.\n\n\n\n\n\n\n\n\n\n\n\n\nWe use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
   },
   {
-    "objectID": "gerry94.html#circonscriptions",
-    "href": "gerry94.html#circonscriptions",
-    "title": "Scalar contradictions & gerrymandering",
-    "section": "Circonscriptions",
-    "text": "Circonscriptions"
+    "objectID": "gerry94.html#geometric-space",
+    "href": "gerry94.html#geometric-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area."
   },
   {
-    "objectID": "gerry94.html#cantons",
-    "href": "gerry94.html#cantons",
-    "title": "Scalar contradictions & gerrymandering",
-    "section": "Cantons",
-    "text": "Cantons\n\n\n\n\n\n\n\n\n\nThe elaboration of 11 circonscription with 25 cantons as building block should normally be feasible by simple agregation with a minimum of cases of fragmentation of cantons. But it is not at all what is observed in the département of Val-de-Marne.\n\n\n\n\n\n\n\n\n\n\nComment : The reason of the contradiction is the electoral reform of departemental election of 2014 which has divided their number by two in order to insure gender equality. Before 2014, the circonscription fullfilled the obligation to be made of aggregates of cantons. But it was not the case after the reform."
+    "objectID": "gerry94.html#demographic-space",
+    "href": "gerry94.html#demographic-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
   },
   {
-    "objectID": "gerry94.html#communes",
-    "href": "gerry94.html#communes",
-    "title": "Scalar contradictions & gerrymandering",
-    "section": "Communes",
-    "text": "Communes\nIn the french electoral system, the communes are a crucial scale of governance below the level of departement (electtion by cantons), the region (election by département) and the national assembly (election by circonscription). It is therefore not possible to understand the logic observe at the levels of cantons and circonscription without looking at the interactions with the level of commune. The differents scales of the electoral system are strongly interlinked.\nIn many cases, the delineation of cantons has divided the most populated communes in subparts. Was it always justified ? And what was the political resason of such subdivisions ?\n\n\n\n\n\n\n\n\n\n\nComment : The map reveals many cases of division of communes between two cantons. This situations appears generally justified by the size of the most populated communes like Vitry-sur-Seine (94081), Créteil (94028), Champigny-sur-Marne. But it is more questionnable in the case of smaller communes like Villeneuvve-Saint-Georges (94078) or Vincennes (94080). We can suspect that some of the fragmentations of communes has been designed in order to favour the victory of one political party in some cantons.\n\nAdmitting that it was necessary to divide some communes at the level of cantons, wasn’t it possible to proceed to their reunification at the level of circonscription ? It should normally be possible but it is not always the case as we can see on the map below.\n\n\n\n\n\n\n\n\n\n\nComment : Some communal divisions at cantonal level has been removed at the level of circonsciption like in the case of Saint-Maur-des-Fossés (94068) or Vincennes (94080). But in other cases the divisions of communes has been maintained and eventually complexified by the apparition of new divisions of communes that do not follow the one introduced by canton. It is particularly the case for Créteil (94028), Vitry-sur-Seine (94081) and Champigny-sur-Marne (94017). This strange result is without any doubt a case of gerrymandering and it is certainly not by chance if the commmunes that has been subject to the most contradictory divisions belong to the same political orientation (left) when reunified communes be;long to the other political orientation (right)."
+    "objectID": "gerry94.html#in-geometric-space",
+    "href": "gerry94.html#in-geometric-space",
+    "title": "Visualisation tool",
+    "section": "In geometric space",
+    "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
   },
   {
-    "objectID": "gerry94.html#data-collection",
-    "href": "gerry94.html#data-collection",
-    "title": "Scalar contradictions & gerrymandering",
-    "section": "Data collection",
-    "text": "Data collection\n\nSocio-econcomic data by IRIS\nSince many years, the french census offers extraordinary precise data at the level of IRIS which are spatial blocks of population with a minimum of approximatively 2000 inhabitants. Such data covers all aspect of social and ecomic life and are associated to many tables available on the website of INSEE. And they can even be related to individual databases where the location of household and people can be precisely associated to the IRIS. It is therefore very simple to analyze the internal social characteristics of circonscription and produce related maps.\n\n\nElectoral data by votation office\nThe votation office are places where citizens are going to make their votations. It is generally a primary school or another municipal infrastructure that play the role of office. The size is a bit smaller than IRIS (approx. 1000 citizens per office). The main problem is that the precise geography of votation office is difficult to represent on a map because it is a list of streets and adresses and not a polygon with borders. Many researchers has tried to indentify theses limits and to cross the area of votation office with the IRIS in order to compare socio-economic data and electoral choices. But it remains difficult and subject to approximations. It is nevertheless of very high interest as we can demonstate by two simple examples."
-  },
-  {
-    "objectID": "gerry94.html#gerrymandering-1",
-    "href": "gerry94.html#gerrymandering-1",
-    "title": "Scalar contradictions & gerrymandering",
-    "section": "Gerrymandering",
-    "text": "Gerrymandering\n\nCase 1 : Cracking\nCracking is a method of gerrymandering where the objective is to split the opponent in area where the party of the author of gerrymandeing is expected to obtain 55-60% of voices. The voices of the opponet are therefore lost.\n\n\n\n\n\n\n\n\n\n\nComment : despite some missing values the two maps clearly help to understand the political strategy of the author of the delineation of the 1st Circonscription of val de Marne. One the one hand, we have the populated and rich commune of Saint-Maur-des-Fossés where the victory of the right-wing political party is obvious (generally with 60 to 70% of vote). On the other hand, we have neighboring communes or pieces of communes where left-wing party are the winners with a large majority. The strategy will be therefore to mix a small proportion of this left-wing area to the right-wing commune of Saint-Maur-des-Fossés in order to keep the majority (with approx. 55%) and limit the election of a left-wing deputy in other circonscriptions.\n\n\n\nCase 2 : Packing\nPacking is the reverse method of grouping all the voices of the opponent in a single circonscription with 80-90% of voices. It is another way to vaste the voices as it would be sufficient to obtain 50% to win a circonscription.\n\n\n\n\n\n\n\n\n\n\nComment : The very strange form of the second circonscription of the Val-de-Marne illustrate the second strategy of gerrymandering which is to concentrate the voices of the opponent party in a limited number of circonscription. The “salamander” form of the circonscription was necessary to put together areas where blue collar and middle class are concentrated and where the right-wing party had no chance to win. Putting tohether the communes of Orly, Thiais and part of Créteil was a very efficient way to waste the voices of the left-wing party …"
+    "objectID": "gerry94.html#in-demographic-space",
+    "href": "gerry94.html#in-demographic-space",
+    "title": "Visualisation tool",
+    "section": "In demographic space",
+    "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
   }
 ]

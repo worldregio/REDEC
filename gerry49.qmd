@@ -1,6 +1,6 @@
 ---
 title: "Visualisation tool"
-subtitle: "The case of Somme (80)"
+subtitle: "The case of Maine-et-Loire (49)"
 author: "Claude Grasland"
 format: 
   html:
@@ -24,10 +24,10 @@ library(adespatial)
 
 
 ```{r}
-mydep <-"80"
-mynomdep <-"Somme"
-capnom <- "Amiens"
-capcode <- "80021"
+mydep <-"49"
+mynomdep <-"Maine-et-Loire"
+capnom <- "Angers"
+capcode <- "49007"
 
 
 
@@ -272,7 +272,7 @@ mf_layout(title = paste(cirnum, ":", mytitle), credits = "", arrow=F, frame=T, s
 
 
 
-```{r, fig.height=20, fig.width=8}
+```{r, fig.height=25, fig.width=8}
 
 listcode<-ci$circode
 nb<-length(listcode)
@@ -284,6 +284,9 @@ mapnetwork(mapbv = bv2,mapcir = ci2, mapca = cap2,cirnum = listcode[i], "Demogra
 
 
 ```
+
+
+
 
 
 
