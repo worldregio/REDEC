@@ -1,0 +1,309 @@
+---
+title: "Visualisation tool"
+subtitle: "The case of Somme (80)"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    comments: false
+    warning: false
+---
+
+
+```{r, echo=FALSE}
+library(sf, quietly = T, verbose=F,warn.conflicts = F)
+library(mapsf, quietly = T, verbose=F,warn.conflicts = F)
+library(dplyr, quietly = T, verbose=F,warn.conflicts = F)
+library(leaflet, quietly = T, verbose=F,warn.conflicts = F)
+library(sp)
+library(spdep)
+library(adespatial)
+```
+
+
+
+```{r}
+mydep <-"80"
+mynomdep <-"Somme"
+capnom <- "Amiens"
+capcode <- "80021"
+
+
+
+bv1<-readRDS(paste0("map/bv",mydep,"/mapbv_voronoi.RDS")) %>% st_transform(2154)
+ci1 <-readRDS(paste0("map/bv",mydep,"/mapcir_voronoi.RDS")) %>% st_transform(2154)
+cap1 <- bv1 %>%filter(comcode==capcode) %>% group_by(comcode,comname) %>% summarise()
+bv2<-readRDS(paste0("map/bv",mydep,"/mapbv_inscrits.RDS")) %>% st_transform(2154)
+ci2 <-readRDS(paste0("map/bv",mydep,"/mapcir_inscrits.RDS")) %>% st_transform(2154)
+ci2 <-st_buffer(ci2,10)
+cap2 <- bv2 %>% filter(comcode==capcode)  %>% group_by(comcode, comname) %>% summarise()
+
+```
+
+
+# Area and population
+
+We propose to visualize the delineation of circonscription with two complementary maps.
+
+## Geometric space
+
+We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.
+
+```{r}
+pdf("img1.pdf")
+par(mfrow=c(1,2), mar=c(0,0,0,0))
+
+## Geographic space
+bv<-bv1
+ci<-ci1
+ca<-cap1
+
+  nbc<-dim(ci)[1]
+  bv$Num <- substr(bv$circode,3,4)
+  bv<-st_make_valid(bv)
+  nbv<-dim(bv)[1]
+  
+  mf_map(bv, type="typo",var="Num", 
+         alpha=0.2, 
+         leg_pos =  "topright", leg_title = "Circ.",
+         border="gray30",
+         lwd=0.2)
+  mf_map(ci, type="base",col=NA,lwd=2,border="black", add=T)
+    mf_map(ca, type="base", col=NA,lwd=2, border="red", add=T,lty=3)
+    mf_label(ca,var="comname", col="red", halo=T)
+
+    mf_layout("",
+          frame=T,
+          scale=T,
+          arrow=F,
+          credits = "")
+   
+## Geographic space
+bv<-bv2
+ci<-ci2
+ca<-cap2
+
+  ci <-st_buffer(ci,10)
+  nbc<-dim(ci)[1]
+  bv$Num <- substr(bv$circode,3,4)
+  bv<-st_make_valid(bv)
+  nbv<-dim(bv)[1]
+  
+  mf_map(bv, type="typo",var="Num", 
+         alpha=0.2, 
+         leg_pos = "topright", leg_title = "Circ.",
+         border="gray30",
+         lwd=0.2)
+  mf_map(ci, type="base",col=NA,lwd=2,border="black", add=T)
+  
+    mf_map(ca, type="base", col=NA,lwd=2, border="red", add=T,lty=3)
+    mf_label(ca,var="comname", col="red", halo=T)
+
+    mf_layout("",
+          frame=T,
+          scale=F,
+          arrow=F,
+          credits = "") 
+    
+dev.off() 
+```
+
+## Demographic space
+
+We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance).
+
+```{r}
+## Geographic space
+bv<-bv2
+ci<-ci2
+ca<-cap2
+
+  ci <-st_buffer(ci,10)
+  nbc<-dim(ci)[1]
+  bv$Num <- substr(bv$circode,3,4)
+  bv<-st_make_valid(bv)
+  nbv<-dim(bv)[1]
+  
+  mf_map(bv, type="typo",var="Num", 
+         alpha=0.2, 
+         leg_pos = "topright", leg_title = "Circ.",
+         border="gray30",
+         lwd=0.2)
+  mf_map(ci, type="base",col=NA,lwd=2,border="black", add=T)
+  
+    mf_map(ca, type="base", col=NA,lwd=2, border="red", add=T,lty=3)
+    mf_label(ca,var="comname", col="red", halo=T)
+
+    mf_layout("Population in demographic space",
+          frame=T,
+          scale=F,
+          arrow=F,
+          credits = "Sources : INSEE, IGN, Min. Intérieur (2022-2026)
+Author : Grasland C., 2026, Preparation of ANR REDEC") 
+    
+```
+
+# Political orientation
+
+The first turn of the presidential election of 2022 is characterized by the emergence of three blocks, represented by the candidates E. Macron (center right), J.L. Melenchon (left) and Marine Le Pen (far right).  It offers a good view of the political landscape before the parliament elections that follows.
+
+
+
+```{r}
+mapchoro <-function(mybv=bv,
+                    myci=ci, 
+                    myvar="Mac", 
+                    myname="Macron",
+                    mypal="Oranges",
+                    mycred = "Author : Grasland C., 2026, Preparation of  ANR REDEC",
+                    myscale = T){
+  
+ bv<-mybv
+ ci<-myci
+ bv$x <-bv[[myvar]]
+bv$x<-100*bv$x/bv$exp
+  mf_map(bv, type="choro",
+         var="x", 
+         breaks="q6",
+         pal=mypal,
+         alpha=0.6,
+         leg_pos =  "topright", 
+         leg_title = "% expr",
+                  leg_val_rnd = 0,
+         border="gray30",
+         lwd=0.1)
+  mf_map(ci, type="base",col=NA,lwd=1,border="black", add=T)
+
+    mf_layout(myname,
+          frame=T,
+          scale=myscale,
+          arrow=F,
+          credits = mycred)
+  
+}
+
+   
+    
+```
+
+
+## In geometric space
+
+What is the distribution of choices by voting office and criconscription in geometric space ?
+
+```{r, fig.with=6, fig.height=15}
+
+par(mfrow=c(3,1))
+
+mapchoro(bv1,ci1,"Mac","Macron","Oranges")
+mapchoro(bv1,ci1,"Mel","Mélenchon","Reds")
+mapchoro(bv1,ci1,"Lep","Le Pen","Blues")
+
+
+    
+```
+
+
+
+
+## In demographic space
+
+What is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote.
+
+```{r, fig.with=6, fig.height=12}
+pdf("img2.pdf")
+par(mfrow=c(3,1))
+
+mapchoro(bv2,ci2,"Mac","Macron","Oranges")
+mapchoro(bv2,ci2,"Mel","Mélenchon","Reds")
+mapchoro(bv2,ci2,"Lep","Le Pen","Blues")
+dev.off()
+```
+
+# Partisan bias ?
+
+To what extent can be observe a partisan bias in the delineation of circonscription ? Do we observe specific concentration of votes in favour of one of the polical block in selected circonscriptions ? Can we suspect the existence of gerrymandering i.e. an intention to favour some political groups by methods of packing and cracking ?
+
+The delineation of circonscription are inherited from an historical period where the main political division was an opposition between left and right. But with the existence of three poles (illustrated by the results of the vote for Macron, Mélenchon and Le Pen), the bias has been strongly modified.
+
+
+```{r}
+
+  
+  
+ #mapbv <- bv1
+ #mapcir <- ci1
+# cirnum <- "3801" 
+  
+bv<-bv2
+cir <-ci2
+ca <- ca2
+leg<-T
+
+ mapdon <- bv 
+ 
+
+# Calcul de la matrice de contiguïté
+mat_conti <- st_intersects(mapdon, mapdon, sparse = FALSE)
+colnames(mat_conti) <- mapdon$bvocode
+rownames(mat_conti) <- mapdon$bvocode
+
+# Suppression de la moitié de la matrice (et de la diagonale)
+mat_conti[lower.tri(mat_conti, diag = TRUE)] <- FALSE
+
+# Construction d'un tableau de lien (i, j) de contiguïté
+reg_link_contig <- as.data.frame.table(mat_conti, responseName = "contig") |> 
+  filter(contig == TRUE)
+
+# Création de la couche géographique de liens
+reg_links_contig  <- mf_get_links(x = mapdon, 
+                                  df = reg_link_contig, 
+                                  x_id = "bvocode", 
+                                  df_id = c("Var1","Var2"))
+
+# Graphe de voisinage
+sel <- bv %>% filter(comcode %in% mapdon$comcode) %>% group_by(comname)%>%
+  summarise() %>% st_buffer(10)
+pdf("img3.pdf")
+mf_map(mapdon, type="base", col="gray90", border=NA)
+#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
+mf_map(ca, type="base", col="lightyellow", border=NA, add=T)
+#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
+
+mf_map(cir, type="base", col=NA, border="black", add=T, lwd=2)
+#mf_map(sel, type="base", var="comcode", add=T, col=NA, lwd=2)
+
+mf_map(reg_links_contig , col = "black", add = TRUE, lwd=0.4)
+#mf_label(sel, var = "comname", cex = 0.8, col = "blue3", halo = TRUE, bg = "white")
+if (leg==T) {
+mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_title = c("nb. inscrits", "Pres. elect. 2022"))
+} else {
+mf_prop_typo(mapdon, var=c("ins","top"), inches=0.07, leg_pos=c(NA,NA))  
+  
+}
+mf_map(ca, type="base",col=NA,border="black", add=T, lwd=2, lty=3)
+#mf_label(ca, var = capnom, col="blue", halo=T)
+#
+
+dev.off()
+
+listcode<-ci$circode
+
+mapnetwork(mapbv = bv2,mapcir = ci2, mapca = cap2,cirnum = listcode[i], "Demographic space", leg=F)
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+

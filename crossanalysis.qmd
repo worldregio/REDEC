@@ -1,6 +1,6 @@
 ---
 title: "Cross analysis "
-subtitle:
+subtitle: "ss"
 author: "Claude Grasland"
 format: 
   html:
