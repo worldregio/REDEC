@@ -1,6 +1,6 @@
 ---
 title: "Geomatic database of REDEC project"
-subtitle: "The case of Val-de-Marne (94)"
+subtitle: "The case of the Val-de-Marne (94)"
 author: "Claude Grasland"
 format: 
   html:
