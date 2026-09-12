@@ -1,0 +1,320 @@
+---
+title: "Distribution of seats by departement for Assemblée Nationale and Senat"
+subtitle: "Prelimlinary statistical explorations"
+date: 2026-11-09
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    warning: false
+    comments: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+library(ggrepel)
+library(knitr)
+library(gtsummary)
+library(DT)
+```
+
+
+
+
+## Objective
+
+This short note aims to examine the distribution of seats in the Sénat and the Assemblée Nationale by département in the Metropolitan area of France (excluding Corsica). We propose to test the following hypothesis :
+
+- **H1:** The correlation between the number of seats and population is more important with past census than the present, due to the lack of recent updates.
+- **H2:** The relation between the number of seats and the number of registered population in 2024 is characterised by negative residuals in départements with important population growth in recent years and positive residuals in départements with declining or stable population.
+- **H3:** The relation between population and number of seats is much lower in the case of the Sénat.
+
+
+## Data 
+
+We limit our analysis to the département of métroolitan France (excluding Corse). The variables to be explained are :
+
+- NBDEP : number of seats at Assemblée Nationale in 2024
+- NBSEN : number of seats at Sénat in 2024
+- I2024 : number of registered citizens in voting office at european election of 2024
+- P1968..P2023 : Total number of inhabitants according to census
+
+```{r}
+map<-readRDS("framet/framet.RDS")
+don<-st_drop_geometry(map)
+don<-don[,c(1:5,17:18,6:16)]
+datatable(don)
+```
+
+## (A) Seats and historical population 
+
+We examine the correlation between the number of seats by department in 2024 and the total population in the past and present. The objective is to determine which (implicit) census year was used to allocate the number of seats. 
+
+### Linear correlation
+
+```{r}
+cordep<-cor(x = don$NBDEP, y=don[,6:14])
+t<-as.numeric(substr(colnames(cordep),2,5))
+r<-as.numeric(cordep)
+tab1<-data.frame(t,r)
+tab1$elec<-"Assemblée Nationale"
+
+
+corsen<-cor(x = don$NBSEN, y=don[,6:14])
+t<-as.numeric(substr(colnames(corsen),2,5))
+r<-as.numeric(corsen)
+tab2<-data.frame(t,r)
+tab2$elec<-"Sénat"
+
+tab<-rbind(tab1,tab2)
+
+ggplot(tab) + aes(x=t, y=r,col=elec, label=t) + 
+  geom_line() + geom_point() + 
+  scale_x_continuous("Year") +
+  scale_y_continuous("Pearson correlation ",limits = c(0.94,1))+
+  ggtitle("Linear correlation between population and seats",subtitle = "(c) REDEC, 2026") +
+  theme_light()
+
+```
+- **Comment: ** The maximum correlation for the Assemblée Nationale occurs in 2010, which seems logical, as it marks the last modification of territorial divisions. The case of the Sénat is trickier, as the maximum correlation is observed in 1990...
+
+### Rank correlation
+
+Do we observe a different conclusion if we use the rank correlation ?
+
+```{r}
+cordep<-cor(x = don$NBDEP, y=don[,6:14], method="spearman")
+t<-as.numeric(substr(colnames(cordep),2,5))
+r<-as.numeric(cordep)
+tab1<-data.frame(t,r)
+tab1$elec<-"Assemblée Nationale"
+
+
+corsen<-cor(x = don$NBSEN, y=don[,6:14], method="spearman")
+t<-as.numeric(substr(colnames(corsen),2,5))
+r<-as.numeric(corsen)
+tab2<-data.frame(t,r)
+tab2$elec<-"Sénat"
+
+tab<-rbind(tab1,tab2)
+
+ggplot(tab) + aes(x=t, y=r,col=elec, label=t) + 
+  geom_line() + geom_point() + 
+  scale_x_continuous("Year") +
+  scale_y_continuous("Spearman correlation", limits=c(0.94,1))+
+  ggtitle("Rank correlation betweenpopulation and seats",subtitle = "(c) REDEC, 2026") +
+  theme_light()
+
+```
+
+- **Comment: ** The conclusion remains the same when we use the more robust rank-correlation indicator, with a maximum in 2010 for the Assemblée Nationale and 1990 for the Sénat. The gap between the two institutions is higher than in the previous case.
+
+
+
+
+
+## (B) Seats and registered citizens in 2024
+
+We propose a model of allocation of seats $N_i$ according to number of register $R_i$ but following a power law with a parameter $\alpha$ indicating if the allocation has been made in strict proportion $\alpha=1$, or with advantage to smaller départements  ($\alpha < 1$) or larger départements ($\alpha > 1$) :
+
+$N_i = k.R_i^\alpha$
+
+### Assemblée Nationale
+
+
+```{r}
+cor.test(log(don$I2024), log(don$NBDEP))
+ggplot(don) +aes(x=I2024/1000, y=NBDEP, label=dept) + 
+  geom_point()+
+  geom_text_repel(size=2,max.overlaps = 30) +
+  scale_x_log10("Registered population in 2024 (1,000)",
+                breaks=c(20, 50, 100,200, 400,800,1600), 
+                minor_breaks=NULL)+
+  scale_y_log10("Number of seats allocated", 
+                breaks=c(1,2, 4, 8, 16),
+                minor_breaks=c(1:21)) + 
+  geom_smooth(method = "glm", col="red",se=F) + 
+  geom_smooth(method = "loess", col="blue", se=F,)+
+  ggtitle("Relation between registered and seats at Assemblée Nationale in 2024",subtitle = "Source : REDEC, 2026")+
+  theme_light()
+
+```
+
+- **Comment** : The assumption of the existence of a power relation between the number of seats and registered citizens in 2024 is reasonable ($r=0.980$  and $p < 0.001$). The plot does not reveal particular autocorrelation problems: the power model (red) is very similar to the non-linear LOESS estimate (blue).  However, we can notice some heteroscedasticity due to important variations in registered population in departments represented by 2 or 3 seats. Territoire de Belfort (90), with 94,000 registered citizens, has 2 seats, the same as Corrèze (19), which has twice as many registered citizens (186,000). Ardennes, with the same number of registered citizens as Corrèze, has 3 seats...
+
+
+```{r}
+x<-glm(NBDEP~log(I2024), data=don,family="poisson")
+tbl_regression(x,intercept = T)
+don$NBDEP_mod <-x$fitted.values
+don$NBDEP_res <- don$NBDEP-don$NBDEP_mod
+```
+
+- **Comment : ** According to the results of the model the allocation seems to offer an advantage to smalle départements ($\alpha = 0.93$) but the confidence interval does not confirm that the parameter is significantly different from 1 ($0.80 < \alpha < 1.10$)
+
+```{r}
+map$growth<-100*((map$P2023/map$P2010)-1)
+map$dif<-don$NBDEP_res
+map$col<-as.factor(map$dif>0)
+levels(map$col) <- c("less than expected", "more than expected")
+mf_map(map, type="choro",var="growth",
+       leg_pos="topleft", 
+       leg_val_rnd=0,
+       leg_title ="Population growth 2010-2023 (%)",
+       pal="Grays",
+       breaks=c(-10,0,5,10,20))
+mf_map(map, type="prop_typo", 
+       var=c("dif","col"), 
+       inches=0.1, 
+       leg_pos="left",
+       leg_val_rnd = c(2,0),
+       leg_title = c("Residual (seats)", "Sign"))
+mf_layout( "Assemblée Nationale : residuals of power model",
+          frame=T, credits = "Projet REDEC, 2026", arrow=F)
+```
+
+- **Comment :** The distribution of the residuals clearly correlates with changes in the population since the last revision of the number of seats in the Assemblée Nationale in 2010. The coastal regions in the West and South are clearly disadvantaged compared with the North-East. The case of the Paris suburbs is different. The fact that there are more seats than expected is probably related to choosing the number of registered voters as the explanatory variable. These residuals would probably disappear if we had chosen the total population as the explanatory variable.
+
+
+### Senat
+
+```{r}
+cor.test(log(don$I2024), log(don$NBSEN))
+ggplot(don) +aes(x=I2024/1000, y=NBSEN, label=dept) + 
+  geom_point()+
+  geom_text_repel(size=2,max.overlaps = 30) +
+  scale_x_log10("Registered population in 2024 (1,000)",
+                breaks=c(20, 50, 100,200, 400,800,1600), 
+                minor_breaks=NULL)+
+  scale_y_log10("Number of seats allocated", 
+                breaks=c(1,2, 4, 8, 16),
+                minor_breaks=c(1:21)) + 
+  geom_smooth(method = "lm", col="red",se=F) + ggtitle("Relation between registered and seats at Sénat in 2024",subtitle = "Source : REDEC, 2026")+
+  geom_smooth(method = "loess", col="blue", se=F,)+
+  theme_light()
+
+
+
+```
+
+- **Comment** : The assumption of a power relationship between the number of seats in the Sénat and the number of registered citizens in 2024 remains significant. Still, it is lower than for the Assemblée Nationale ($r=0.930$ and $p < 0.001$). However, the plot reveals a strong autocorrelation problem in the residuals. The power model estimate (red) differs clearly from the non-linear LOESS estimate (blue). We can see strong heteroscedasticity due to large variations in registered populations across départements represented by 2 or 3 seats in the Sénat. For example, the département of Creuse (23) has two seats in the Sénat for only 90,000 registered citizens in 2024. Pyrénées-Orientales (66) also has two seats with 373,000 registered citizens in 2024. And Eure-et-Loir (28), with 304,000 registered citizens, has 3 seats ...
+
+
+
+```{r}
+x<-glm(NBSEN~log(I2024), data=don,family="poisson")
+tbl_regression(x,intercept = T)
+don$NBSEN_mod <-x$fitted.values
+don$NBSEN_res <- don$NBSEN-don$NBSEN_mod
+```
+
+- **Comment : ** According to the model results, the allocation seems to offer a strong advantage to smaller départements ($\alpha = 0.73$).  The confidence interval confirms that the parameter differs significantly from 1 ($0.56 < \alpha < 0.89$). Unlike the Assemblée Nationale, the distribution of seats in the Sénat is clearly not proportional to registration.
+
+```{r}
+map$growth<-100*((map$P2023/map$P2010)-1)
+map$dif<-don$NBSEN_res
+map$col<-as.factor(map$dif>0)
+levels(map$col) <- c("less than expected", "more than expected")
+mf_map(map, type="choro",var="growth",
+       leg_pos="topleft", 
+       leg_val_rnd=0,
+       leg_title ="Population growth 2010-2023 (%)",
+       pal="Grays",
+       breaks=c(-10,0,5,10,20))
+mf_map(map, type="prop_typo", 
+       var=c("dif","col"), 
+       inches=0.15, 
+       leg_pos="left",
+       leg_val_rnd = c(2,0),
+       leg_title = c("Residual (seats)", "Sign"))
+mf_layout( "Sénat : residuals of power model",
+          frame=T, credits = "Projet REDEC, 2026", arrow=F)
+```
+
+- **Comment :** The distribution of residuals for the Sénat is to some extent similar to the distribution observed for the Assemblée Nationale. We do recognise residuals in areas with large populations in the South. What differs is that the positive residuals benefit the North-East of France less than Île-de-France, and in particular the département of Paris. According to the power model, Paris should have 7.5 seats instead of 12, which means an exceptional positive residual of 4.5. But we have to keep in mind that the distribution of residuals in the case of the Senate is strongly biased by autocorrelation and heteroscedasticity.
+
+## (C) Benchmarking Sénat and Assemblée Nationale
+
+Without considering population or the number of registered voters, what are the differences between the Sénat and the Assemblée Nationale in terms of political representation? In other words, can we say that the Sénat better represents some départements than the Assemblée Nationale, and vice versa? To answer this question, we can estimate the number of seats in the Sénat based on the number of seats in the Assemblée Nationale, using the same model of power relations as in the previous section. 
+
+```{r}
+
+ggplot(don) +aes(x=NBDEP, y=NBSEN, label=dept) + 
+  geom_point()+
+  geom_text_repel(size=2,max.overlaps = 30) +
+  scale_x_log10("% of seats in Assemblée Nationale",
+                 breaks=c(1,2, 4, 8, 16),
+                minor_breaks=c(1:21)) + 
+  scale_y_log10("% of seats in Sénat", 
+                breaks=c(1,2, 4, 8, 16),
+                minor_breaks=c(1:21)) + 
+  geom_smooth(method = "glm", col="red",se=F) + 
+  geom_smooth(method = "loess", col="blue", se=F,)+
+  ggtitle("Relation between seats in Sénat and Assemblée Nationale in 2024",subtitle = "Source : REDEC, 2026")+
+  theme_light()
+```
+
+- **Comment :** This correlation diagram underlines the problem introduced by transforming population into a discrete number of seats. As we can see, many départements are characterised by similar allocations of seats, with typical situations like 2 seats in both assemblies (12 cases) or 5 seats in the Assemblée Nationale and 3 in the Sénat (16 cases).
+
+```{r}
+x<-glm(NBSEN~log(NBDEP), data=don,family="poisson")
+tbl_regression(x,intercept = T)
+don$NBSEN_mod2 <-x$fitted.values
+don$NBSEN_res2 <- don$NBSEN-don$NBSEN_mod2
+
+```
+
+- **Comment** :  According to the results of the model, the relation is significant ($r=0.932$ and $p <0.001$), but the coefficient of the power relation is clearly lower than 1 ($\alpha = 0.79$) with a confidence interval ($0.62 < \alpha < 0.97$).  We can therefore establish the following rule :
+
+$NB.SENAT_i = 0.87 \times (NB.DEPUT_i)^{0.79}$
+
+This result means that the département with the smallest population (characterised by low population density) will be better represented in the Sénat than in the Assemblée Nationale. This is visible if we convert the number of seats to percentages and compute the difference. 
+
+
+
+
+```{r}
+don$NBDEPpct<-100*don$NBDEP/sum(don$NBDEP)
+don$NBSENpct<-100*don$NBSEN/sum(don$NBSEN)
+don$dif2<-don$NBDEPpct-don$NBSENpct
+don$col2<-as.factor(don$dif2>0)
+levels(don$col2) <- c("% Sénat > % Ass. Nationale", "% Ass. Nationale > % Sénat")
+map<-left_join(map,don)
+mf_map(map, type="choro",var="DEN",
+       leg_pos="topleft", 
+       leg_val_rnd=0,
+       leg_title ="Ppulation density in 2023 (hab./km2)",
+       pal="Grays",
+       breaks=c(10,20,40, 80, 160, 320, 20000))
+mf_map(map, type="prop_typo", 
+       var=c("dif2","col2"), 
+       inches=0.1, 
+       leg_pos="left",
+       leg_val_rnd = c(2,0),
+       add=T,
+       leg_title = c("Différence of %", "Avantage"))
+mf_layout("Benchmarking representation in Sénat and Assemblée Nationale",
+          frame=T, credits = "Projet REDEC, 2026", arrow=F)
+```
+
+- **Comment** : The map reveals a clear relationship between the population density of départements and their representation in the Sénat (low density) and the Assemblée Nationale (high density). The départements with better representation in the Sénat belong to what is generally called the "diagonale du vide", from the Ardennes to the Pyrénées. The départements with better representation in the Assemblée Nationale are typically those where the most important cities and metropolitan areas are located (Paris, Lille, Marseille, Nantes, Bordeaux, Toulouse, Montpellier, Grenoble, ...).
+
+## Discussion
+
+The fact that the Senate presents itself as a chamber representing *territories* rather than *citizens* is not in itself shocking. Many countries have, in fact, structured their second chamber not on a basis proportional to population but rather to the number of autonomous political entities. For example, each department could send two representatives to the Senate. One could even imagine each department having representation in the Senate proportional to its *area*, if the word ‘territory’ is taken in its geometric sense. The Gironde, with an area of 9,976 km², would then have almost 100 times as many senators as the department of Paris, with its 105 km². But one might perhaps hesitate to apply this rule to French Guiana and its 83,856 km²...
+
+
+The real problem with the current situation is that the Senate nevertheless claims to provide representation proportional to the number of citizens, but does so in a completely biased manner, using a system that penalises the most populous departments (see the power-law parameter $\alpha = 0.73$) and based on population figures that appear to date back to 1980. This is therefore a false form of proportionality and a manifestly unfair rule, since departments with the same number of representatives in the Senate may have populations varying by a ratio of 1 to 4.
+
+
+The observed link between population density and over-representation in the Senate, compared with the National Assembly, is largely an artefact. It results from an imperfect proportionality law combined with an outdated census reference framework that favours territories whose populations have grown the least. If one were genuinely to ensure objective representation for the least densely populated territories, a new measure would need to be devised, combining, for example, the share of the population and the share of the departments’ total area according to a precise rule of the following type:
+
+$Weight_i = (\frac{Area_i}{Total_area})^\mu \times (\frac{Pop_i}{Total_pop})^{1-\mu}$
+
+But are departments really the best level at which to make decisions?

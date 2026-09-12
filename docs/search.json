@@ -196,6 +196,90 @@
     "text": "Filosofi 2021\nThe INSEE grid of population Filosofi at the resolution of 200m x 200m has been published in 2021 with a set of 30 indicators describing the population by age and sex and some economic and social indicator derived from census like the median income of the houshold, the share of social housing, etc. This resolution of 200m is generally sufficient to charactrize the situation of voting office, even if some approximation is requested in central urban area. As an example, here is the distribution of voting office and grid data inthe capital city of the département.\n\n\nWarning: st_centroid assumes attributes are constant over geometries"
   },
   {
+    "objectID": "exp002.html",
+    "href": "exp002.html",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "",
+    "text": "This short note aims to examine the distribution of seats in the Sénat and the Assemblée Nationale by département in the Metropolitan area of France (excluding Corsica). We propose to test the following hypothesis :\n\nH1: The correlation between the number of seats and population is more important with past census than the present, due to the lack of recent updates.\nH2: The relation between the number of seats and the number of registered population in 2024 is characterised by negative residuals in départements with important population growth in recent years and positive residuals in départements with declining or stable population.\nH3: The relation between population and number of seats is much lower in the case of the Sénat."
+  },
+  {
+    "objectID": "exp002.html#objective",
+    "href": "exp002.html#objective",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "",
+    "text": "This short note aims to examine the distribution of seats in the Sénat and the Assemblée Nationale by département in the Metropolitan area of France (excluding Corsica). We propose to test the following hypothesis :\n\nH1: The correlation between the number of seats and population is more important with past census than the present, due to the lack of recent updates.\nH2: The relation between the number of seats and the number of registered population in 2024 is characterised by negative residuals in départements with important population growth in recent years and positive residuals in départements with declining or stable population.\nH3: The relation between population and number of seats is much lower in the case of the Sénat."
+  },
+  {
+    "objectID": "exp002.html#data",
+    "href": "exp002.html#data",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "Data",
+    "text": "Data\nWe limit our analysis to the département of métroolitan France (excluding Corse). The variables to be explained are :\n\nNBDEP : number of seats at Assemblée Nationale in 2024\nNBSEN : number of seats at Sénat in 2024\nI2024 : number of registered citizens in voting office at european election of 2024\nP1968..P2023 : Total number of inhabitants according to census"
+  },
+  {
+    "objectID": "exp002.html#a-seats-and-historical-population",
+    "href": "exp002.html#a-seats-and-historical-population",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "(A) Seats and historical population",
+    "text": "(A) Seats and historical population\nWe examine the correlation between the number of seats by department in 2024 and the total population in the past and present. The objective is to determine which (implicit) census year was used to allocate the number of seats.\n\nLinear correlation\n\n\n\n\n\n\n\n\n\n\nComment:  The maximum correlation for the Assemblée Nationale occurs in 2010, which seems logical, as it marks the last modification of territorial divisions. The case of the Sénat is trickier, as the maximum correlation is observed in 1990…\n\n\n\nRank correlation\nDo we observe a different conclusion if we use the rank correlation ?\n\n\n\n\n\n\n\n\n\n\nComment:  The conclusion remains the same when we use the more robust rank-correlation indicator, with a maximum in 2010 for the Assemblée Nationale and 1990 for the Sénat. The gap between the two institutions is higher than in the previous case."
+  },
+  {
+    "objectID": "exp002.html#b-seats-and-registered-citizens-in-2024",
+    "href": "exp002.html#b-seats-and-registered-citizens-in-2024",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "(B) Seats and registered citizens in 2024",
+    "text": "(B) Seats and registered citizens in 2024\nWe propose a model of allocation of seats \\(N_i\\) according to number of register \\(R_i\\) but following a power law with a parameter \\(\\alpha\\) indicating if the allocation has been made in strict proportion \\(\\alpha=1\\), or with advantage to smaller départements (\\(\\alpha &lt; 1\\)) or larger départements (\\(\\alpha &gt; 1\\)) :\n\\(N_i = k.R_i^\\alpha\\)\n\nAssemblée Nationale\n\n\n\n    Pearson's product-moment correlation\n\ndata:  log(don$I2024) and log(don$NBDEP)\nt = 46.642, df = 92, p-value &lt; 2.2e-16\nalternative hypothesis: true correlation is not equal to 0\n95 percent confidence interval:\n 0.9692468 0.9863627\nsample estimates:\n      cor \n0.9795032 \n\n\n\n\n\n\n\n\n\n\nComment : The assumption of the existence of a power relation between the number of seats and registered citizens in 2024 is reasonable (\\(r=0.980\\) and \\(p &lt; 0.001\\)). The plot does not reveal particular autocorrelation problems: the power model (red) is very similar to the non-linear LOESS estimate (blue). However, we can notice some heteroscedasticity due to important variations in registered population in departments represented by 2 or 3 seats. Territoire de Belfort (90), with 94,000 registered citizens, has 2 seats, the same as Corrèze (19), which has twice as many registered citizens (186,000). Ardennes, with the same number of registered citizens as Corrèze, has 3 seats…\n\n\n\n\n\n\n\n\n\nCharacteristic\nlog(IRR)\n95% CI\np-value\n\n\n\n\n(Intercept)\n-10\n-12, -8.7\n&lt;0.001\n\n\nlog(I2024)\n0.93\n0.80, 1.1\n&lt;0.001\n\n\n\nAbbreviations: CI = Confidence Interval, IRR = Incidence Rate Ratio\n\n\n\n\n\n\n\n\n\nComment :  According to the results of the model the allocation seems to offer an advantage to smalle départements (\\(\\alpha = 0.93\\)) but the confidence interval does not confirm that the parameter is significantly different from 1 (\\(0.80 &lt; \\alpha &lt; 1.10\\))\n\n\n\n\n\n\n\n\n\n\n\nComment : The distribution of the residuals clearly correlates with changes in the population since the last revision of the number of seats in the Assemblée Nationale in 2010. The coastal regions in the West and South are clearly disadvantaged compared with the North-East. The case of the Paris suburbs is different. The fact that there are more seats than expected is probably related to choosing the number of registered voters as the explanatory variable. These residuals would probably disappear if we had chosen the total population as the explanatory variable.\n\n\n\nSenat\n\n\n\n    Pearson's product-moment correlation\n\ndata:  log(don$I2024) and log(don$NBSEN)\nt = 24.13, df = 92, p-value &lt; 2.2e-16\nalternative hypothesis: true correlation is not equal to 0\n95 percent confidence interval:\n 0.8952153 0.9525410\nsample estimates:\n      cor \n0.9292749 \n\n\n\n\n\n\n\n\n\n\nComment : The assumption of a power relationship between the number of seats in the Sénat and the number of registered citizens in 2024 remains significant. Still, it is lower than for the Assemblée Nationale (\\(r=0.930\\) and \\(p &lt; 0.001\\)). However, the plot reveals a strong autocorrelation problem in the residuals. The power model estimate (red) differs clearly from the non-linear LOESS estimate (blue). We can see strong heteroscedasticity due to large variations in registered populations across départements represented by 2 or 3 seats in the Sénat. For example, the département of Creuse (23) has two seats in the Sénat for only 90,000 registered citizens in 2024. Pyrénées-Orientales (66) also has two seats with 373,000 registered citizens in 2024. And Eure-et-Loir (28), with 304,000 registered citizens, has 3 seats …\n\n\n\n\n\n\n\n\n\nCharacteristic\nlog(IRR)\n95% CI\np-value\n\n\n\n\n(Intercept)\n-8.3\n-10, -6.1\n&lt;0.001\n\n\nlog(I2024)\n0.73\n0.56, 0.89\n&lt;0.001\n\n\n\nAbbreviations: CI = Confidence Interval, IRR = Incidence Rate Ratio\n\n\n\n\n\n\n\n\n\nComment :  According to the model results, the allocation seems to offer a strong advantage to smaller départements (\\(\\alpha = 0.73\\)). The confidence interval confirms that the parameter differs significantly from 1 (\\(0.56 &lt; \\alpha &lt; 0.89\\)). Unlike the Assemblée Nationale, the distribution of seats in the Sénat is clearly not proportional to registration.\n\n\n\n\n\n\n\n\n\n\n\nComment : The distribution of residuals for the Sénat is to some extent similar to the distribution observed for the Assemblée Nationale. We do recognise residuals in areas with large populations in the South. What differs is that the positive residuals benefit the North-East of France less than Île-de-France, and in particular the département of Paris. According to the power model, Paris should have 7.5 seats instead of 12, which means an exceptional positive residual of 4.5. But we have to keep in mind that the distribution of residuals in the case of the Senate is strongly biased by autocorrelation and heteroscedasticity."
+  },
+  {
+    "objectID": "exp002.html#c-benchmarking-sénat-and-assemblée-nationale",
+    "href": "exp002.html#c-benchmarking-sénat-and-assemblée-nationale",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "(C) Benchmarking Sénat and Assemblée Nationale",
+    "text": "(C) Benchmarking Sénat and Assemblée Nationale\nWithout considering population or the number of registered voters, what are the differences between the Sénat and the Assemblée Nationale in terms of political representation? In other words, can we say that the Sénat better represents some départements than the Assemblée Nationale, and vice versa? To answer this question, we can estimate the number of seats in the Sénat based on the number of seats in the Assemblée Nationale, using the same model of power relations as in the previous section.\n\n\n\n\n\n\n\n\n\n\nComment : This correlation diagram underlines the problem introduced by transforming population into a discrete number of seats. As we can see, many départements are characterised by similar allocations of seats, with typical situations like 2 seats in both assemblies (12 cases) or 5 seats in the Assemblée Nationale and 3 in the Sénat (16 cases).\n\n\n\n\n\n\n\n\n\nCharacteristic\nlog(IRR)\n95% CI\np-value\n\n\n\n\n(Intercept)\n-0.14\n-0.49, 0.19\n0.4\n\n\nlog(NBDEP)\n0.79\n0.62, 0.97\n&lt;0.001\n\n\n\nAbbreviations: CI = Confidence Interval, IRR = Incidence Rate Ratio\n\n\n\n\n\n\n\n\n\nComment : According to the results of the model, the relation is significant (\\(r=0.932\\) and \\(p &lt;0.001\\)), but the coefficient of the power relation is clearly lower than 1 (\\(\\alpha = 0.79\\)) with a confidence interval (\\(0.62 &lt; \\alpha &lt; 0.97\\)). We can therefore establish the following rule :\n\n\\(NB.SENAT_i = 0.87 \\times (NB.DEPUT_i)^{0.79}\\)\nThis result means that the département with the smallest population (characterised by low population density) will be better represented in the Sénat than in the Assemblée Nationale. This is visible if we convert the number of seats to percentages and compute the difference.\n\n\n\n\n\n\n\n\n\n\nComment : The map reveals a clear relationship between the population density of départements and their representation in the Sénat (low density) and the Assemblée Nationale (high density). The départements with better representation in the Sénat belong to what is generally called the “diagonale du vide”, from the Ardennes to the Pyrénées. The départements with better representation in the Assemblée Nationale are typically those where the most important cities and metropolitan areas are located (Paris, Lille, Marseille, Nantes, Bordeaux, Toulouse, Montpellier, Grenoble, …)."
+  },
+  {
+    "objectID": "exp002.html#discussion",
+    "href": "exp002.html#discussion",
+    "title": "Distribution of seats by departement for Assemblée Nationale and Senat",
+    "section": "Discussion",
+    "text": "Discussion\nThe fact that the Senate presents itself as a chamber representing territories rather than citizens is not in itself shocking. Many countries have, in fact, structured their second chamber not on a basis proportional to population but rather to the number of autonomous political entities. For example, each department could send two representatives to the Senate. One could even imagine each department having representation in the Senate proportional to its area, if the word ‘territory’ is taken in its geometric sense. The Gironde, with an area of 9,976 km², would then have almost 100 times as many senators as the department of Paris, with its 105 km². But one might perhaps hesitate to apply this rule to French Guiana and its 83,856 km²…\nThe real problem with the current situation is that the Senate nevertheless claims to provide representation proportional to the number of citizens, but does so in a completely biased manner, using a system that penalises the most populous departments (see the power-law parameter \\(\\alpha = 0.73\\)) and based on population figures that appear to date back to 1980. This is therefore a false form of proportionality and a manifestly unfair rule, since departments with the same number of representatives in the Senate may have populations varying by a ratio of 1 to 4.\nThe observed link between population density and over-representation in the Senate, compared with the National Assembly, is largely an artefact. It results from an imperfect proportionality law combined with an outdated census reference framework that favours territories whose populations have grown the least. If one were genuinely to ensure objective representation for the least densely populated territories, a new measure would need to be devised, combining, for example, the share of the population and the share of the departments’ total area according to a precise rule of the following type:\n\\(Weight_i = (\\frac{Area_i}{Total_area})^\\mu \\times (\\frac{Pop_i}{Total_pop})^{1-\\mu}\\)\nBut are departments really the best level at which to make decisions?"
+  },
+  {
+    "objectID": "gerry38.html",
+    "href": "gerry38.html",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We propose to visualize the delineation of circonscription with two complementary maps.\n\n\nWe use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.\n\n\n\n\n\n\n\n\n\n\n\n\nWe use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
+  },
+  {
+    "objectID": "gerry38.html#geometric-space",
+    "href": "gerry38.html#geometric-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area."
+  },
+  {
+    "objectID": "gerry38.html#demographic-space",
+    "href": "gerry38.html#demographic-space",
+    "title": "Visualisation tool",
+    "section": "",
+    "text": "We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
+  },
+  {
+    "objectID": "gerry38.html#in-geometric-space",
+    "href": "gerry38.html#in-geometric-space",
+    "title": "Visualisation tool",
+    "section": "In geometric space",
+    "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
+  },
+  {
+    "objectID": "gerry38.html#in-demographic-space",
+    "href": "gerry38.html#in-demographic-space",
+    "title": "Visualisation tool",
+    "section": "In demographic space",
+    "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
+  },
+  {
     "objectID": "exp001.html",
     "href": "exp001.html",
     "title": "K-means clustering in demographic space",
@@ -243,41 +327,6 @@
     "title": "K-means clustering in demographic space",
     "section": "Discussion",
     "text": "Discussion\nThis analysis confirms that the legal obligation to build circonscription has aggregates of communes limits the possibility to reach optimal solutions and create a legal confusion between two elections. The cantons are instrument of local elections (département) when circonscription are instrument of national elections. Using the voting office as building blocks would be more logical if we admit that a member of the parliament is not defending a local area but elabrating national policy …"
-  },
-  {
-    "objectID": "gerry38.html",
-    "href": "gerry38.html",
-    "title": "Visualisation tool",
-    "section": "",
-    "text": "We propose to visualize the delineation of circonscription with two complementary maps.\n\n\nWe use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area.\n\n\n\n\n\n\n\n\n\n\n\n\nWe use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
-  },
-  {
-    "objectID": "gerry38.html#geometric-space",
-    "href": "gerry38.html#geometric-space",
-    "title": "Visualisation tool",
-    "section": "",
-    "text": "We use here the classical map in geometric space with eucldean distance. We can therefore viusalize large surfaces corresponding to low density area and small surfaces corresponding to high density area."
-  },
-  {
-    "objectID": "gerry38.html#demographic-space",
-    "href": "gerry38.html#demographic-space",
-    "title": "Visualisation tool",
-    "section": "",
-    "text": "We use here a cartogramme transformation of voting office in order to produce a demographic space where the area is proportional to the number of people officially allowed to vote. The distance between two points is the number of inhabitant between origin and destination (the Stouffer distance)."
-  },
-  {
-    "objectID": "gerry38.html#in-geometric-space",
-    "href": "gerry38.html#in-geometric-space",
-    "title": "Visualisation tool",
-    "section": "In geometric space",
-    "text": "In geometric space\nWhat is the distribution of choices by voting office and criconscription in geometric space ?"
-  },
-  {
-    "objectID": "gerry38.html#in-demographic-space",
-    "href": "gerry38.html#in-demographic-space",
-    "title": "Visualisation tool",
-    "section": "In demographic space",
-    "text": "In demographic space\nWhat is the picture if we transform the map in a cartogramme where the area is proportional to the number of registered people that was likely to vote."
   },
   {
     "objectID": "case80.html",
