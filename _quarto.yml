@@ -9,6 +9,8 @@ website:
         text: "Home"
       - text: Geomatic backoffice
         menu:
+          - href: case03.qmd  
+            text: "Allier (03)"          
           - href: case38.qmd  
             text: "Isère (38)"   
           - href: case49.qmd  
@@ -19,6 +21,8 @@ website:
             text: "Val-de-Marne (94)"
       - text: Visualization tools
         menu:
+          - href: gerry03.qmd  
+            text: "Allier (03)"         
           - href: gerry38.qmd  
             text: "Isère (38)"   
           - href: gerry49.qmd  
