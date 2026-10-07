@@ -289,7 +289,7 @@ map<-left_join(map,don)
 mf_map(map, type="choro",var="DEN",
        leg_pos="topleft", 
        leg_val_rnd=0,
-       leg_title ="Ppulation density in 2023 (hab./km2)",
+       leg_title ="Population density in 2023 (hab./km2)",
        pal="Grays",
        breaks=c(10,20,40, 80, 160, 320, 20000))
 mf_map(map, type="prop_typo", 
@@ -305,7 +305,6 @@ mf_layout("Benchmarking representation in Sénat and Assemblée Nationale",
 
 - **Comment** : The map reveals a clear relationship between the population density of départements and their representation in the Sénat (low density) and the Assemblée Nationale (high density). The départements with better representation in the Sénat belong to what is generally called the "diagonale du vide", from the Ardennes to the Pyrénées. The départements with better representation in the Assemblée Nationale are typically those where the most important cities and metropolitan areas are located (Paris, Lille, Marseille, Nantes, Bordeaux, Toulouse, Montpellier, Grenoble, ...).
 
-## Discussion
 
 The fact that the Senate presents itself as a chamber representing *territories* rather than *citizens* is not in itself shocking. Many countries have, in fact, structured their second chamber not on a basis proportional to population but rather to the number of autonomous political entities. For example, each department could send two representatives to the Senate. One could even imagine each department having representation in the Senate proportional to its *area*, if the word ‘territory’ is taken in its geometric sense. The Gironde, with an area of 9,976 km², would then have almost 100 times as many senators as the department of Paris, with its 105 km². But one might perhaps hesitate to apply this rule to French Guiana and its 83,856 km²...
 
@@ -318,3 +317,137 @@ The observed link between population density and over-representation in the Sena
 $Weight_i = (\frac{Area_i}{Total_area})^\mu \times (\frac{Pop_i}{Total_pop})^{1-\mu}$
 
 But are departments really the best level at which to make decisions?
+
+
+## (D) The legal point of view
+
+### The revision of 1966 
+
+The definition of the number of seats in Senat was modified in 1966 by the [law 66-504 from 12-07-1966](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000504684). One of the reason of the revision was the modification of the departements of Seine and Seine-et-Oise, replaced by 7 new départements. The consequence of the revision was an increase of the number of sénateurs from 30 to 39 in this area and from 255 to 264 in the metropolitan area of France. We can notice that the increase (+9) of seats was limited to the metropolitan area of Paris, without considerng other départements where population changes could have justify changes.
+
+![Revision of senateurs in Paris region, 1966](img/senat_1966.jpg)
+
+
+### The revision of 2003
+
+The last revision of the number of seats in Sénat was decided in 2003 in order to take into account demographic changes. But the rule adopted was criticized and contested by left-wing party which asked to the Conseil Constitutionnel a censorship. This censorship was not adopted but it is interesting to look at the motivation of the decision :
+
+::: {.callout-tip title="The decision 2003-475 DC from Conseil Constitutionnel"}
+
+Les dispositions combinées de l'article 6 de la Déclaration de 1789 et des articles 3 et 24 de la Constitution imposent au législateur de modifier la répartition par département des sièges de sénateurs pour tenir compte des évolutions de la population des collectivités territoriales dont le Sénat assure la représentation. Pour modifier la répartition par département des sièges de sénateurs figurant au tableau n° 6 annexé à la partie législative du code électoral, le législateur a retenu un système de répartition par tranches, soit un sénateur jusqu'à 150 000 habitants, puis un sénateur supplémentaire par tranche ou fraction de tranche de 250 000 habitants. Si l'application d'un tel système maintient certaines disparités démographiques, les modifications qui résultent de la loi déférée n'en réduisent pas moins sensiblement les inégalités de représentation antérieures. En conservant aux départements de la Creuse et de Paris leur représentation antérieure, le législateur a apporté une dérogation au mode de calcul qu'il avait lui-même retenu. Toutefois, pour regrettable qu'elle soit, cette dérogation, qui intéresse 4 sièges, ne porte pas au principe d'égalité devant le suffrage une atteinte telle qu'elle entacherait d'inconstitutionnalité la loi déférée. Eu égard au rôle confié au Sénat par l'article 24 de la Constitution, la nouvelle répartition des sièges n'est pas contraire à la Constitution.
+
+(2003-475 DC, 24 juillet 2003, cons. 2, 3, 5, 6, 7, 8, Journal officiel du 31 juillet 2003, page 13038)
+
+:::
+
+### The rule of 2003 (version 1)
+
+
+The interest of the judgement of 2003 is to provide an explicit formulation of the rule used for the definition of the number of seats which was formulated as follow :
+
+- **rule 1** :  One seat for each département until 150 000 h
+- **rule 2** :  One seat more for each "*tranche*" or "*number of tranche*" of 250 000 h
+
+Which can be formalized, if we undestrand correctly by the formula :
+
+$Y = 1 + round(\frac{X-150000}{250000})$
+
+
+
+If we assume that the law was based on the census of 1999 which was the last available at that time, can we verify that the application was correct with the exceptions of Creuse and Paris ?
+
+```{r}
+map$MIN = 1
+map$SUP <- (map$P1999-150000)/250000
+map$TOT <- map$MIN+round(map$SUP)
+map$DIF <- map$NBSEN-map$TOT
+
+tab<- map %>% select(dept,dept_nom,P1999, NBSEN,MIN,SUP,TOT, DIF) %>% st_drop_geometry() %>% arrange(-DIF)
+
+sel<-tab %>% filter(DIF>0)
+kable(sel)
+
+```
+
+We observe clearly that our version 1 of the rule is not correct because they are 35 départements with positive residuals. 
+
+### The rule of 2003 (version 2)
+
+The correct version of the rule of 2003 seems to be different and should be better interpreted as the addition of a new seat whatever the decimal. 
+
+
+$Y = 1+round(\frac{X-150000}{250000} +0.5)$
+
+
+```{r}
+map$MIN = 1
+map$SUP <- (map$P1999-150000)/250000
+map$TOT <- map$MIN+round(0.5+map$SUP)
+map$DIF <- map$NBSEN-map$TOT
+
+tab<- map %>% select(dept,dept_nom,P1999, NBSEN,MIN, SUP,TOT,DIF) %>% st_drop_geometry() %>% arrange(-DIF)
+
+sel<-tab %>% filter(DIF>0)
+kable(sel)
+
+```
+
+We obtain the correct result with the two exceptions of Creuse and Paris described by the conseil constitutionnel. 
+
+
+### Transposition to 2023
+
+We can now apply the rule of 2003 to the situation of 2023. Considering that the population has increased from 58.25 millions to 65.81 millions of inhabitants, we decide to modify the threshold by the coefficient of increase of the population in order to avoid an increase of seats in Senat :
+
+$Y = 1+round(\frac{X-169445}{282408} +0.5)$
+
+
+With this formula we obtain an estimated number of 312 seats against 313 in current situation.
+
+```{r}
+map$MIN = 1
+map$SUP <- (map$P2023-169445)/282408
+map$TOT <- map$MIN+round(0.5+map$SUP)
+map$DIF <- map$NBSEN-map$TOT
+
+tab<- map %>% select(dept,dept_nom,P2023, NBSEN,MIN, SUP,TOT,DIF) %>% st_drop_geometry() %>% arrange(-DIF)
+
+sel<-tab %>% filter(DIF!=0)
+kable(sel, caption = "Application of the rule of 2003 to 2023")
+sum(don$NBSEN)
+
+
+
+```
+
+```{r}
+map$growth<-100*((map$P2023/map$P1999)-1)
+map$col<-as.factor(map$DIF>0)
+summary(map$growth)
+levels(map$col) <- c("less than expected", "more than expected")
+mf_map(map, type="choro",var="growth",
+       leg_pos="topleft", 
+       leg_val_rnd=0,
+       leg_title ="Population growth 1999-2023 (%)",
+       pal="Grays",
+       breaks=c(-15,0,15,30, 45))
+mf_map(map, type="prop_typo", 
+       var=c("DIF","col"), 
+       inches=0.15, 
+       leg_pos="left",
+       leg_val_rnd = c(2,0),
+       leg_title = c("Residual (seats)", "Sign"))
+mf_layout( "Sénat : Application of the rule of 2003 to population of 2023",
+          frame=T, credits = "Projet REDEC, 2026", arrow=F)
+```
+
+- **Comment** : The transposition of the rule of 2003 to the demographic data of 2023 would not produce dramatic changes in the distribution of Senat. The table and the map indicates that only 15 seats should be transferred from Paris and other departements in demographic decline to the départements with growing population of southern and western France. This modification would therefore not modify the geographical and political equilibrium. 
+
+## Conclusion
+
+The different analysis realized with the **power model** has revealed that the number of seats in Sénat is clearly not proportional to population and provide a very important advantage to départements with low population which are generally characterized by low density. The coefficient of the power law linking population and seats is clearly lower than 1 which means that the allocation of seats is strongly biased by what the geographers call the MAUP (Modifiable Area Unit Problem). The merging of two departements in one would necessary decrease their number of seats when the splitting would increase the number of seats. It is unfair and certainly not logical.
+
+The legal analysis of the rule of 2003 suggest that the problem is strongly enhanced in the formula used for the allocation of seats. The application  of the same rule to the demographic data of 2023 would not change the inequalities revealed by the power model. It is clearly the rule that should be modified.
+
+
+

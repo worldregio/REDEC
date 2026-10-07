@@ -1,0 +1,258 @@
+---
+title: "Allocation of grid data to voting offices"
+subtitle: "Prelimlinary statistical explorations"
+date: 2026-11-09
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    warning: false
+    comments: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+library(ggrepel)
+library(knitr)
+library(gtsummary)
+library(DT)
+```
+
+
+
+
+## Objective
+
+Linking electoral data and socio-economic data at the level of voting offices.
+
+
+## (A) Geometric interesection
+
+### Load map of voting offices
+
+```{r}
+## Carte des bureaux de votes
+bv<-readRDS("map/bv38/mapbv_voronoi.RDS")
+plot(bv$geometry)
+```
+
+### Load centroid of grid
+
+```{r}
+## Carte des bureaux de votes
+gri<-readRDS("map/bv38/grid2021.RDS")
+
+## Centroïdes 
+grictr<-st_centroid(gri)
+plot(gri$geom)
+```
+
+
+### Geometric intersection
+
+We proceed to a geometric interesection of the two geometries in order to allocate each grid point to a voting office. Only a few seconds are necessary to achieve the task in the case of Isère (41768 grid points and 1070 voting offices)
+
+```{r}
+bvcode <- bv %>% select(bvocode)
+
+x<-st_join(bvcode, gri)
+
+```
+
+
+## (B) Socio economic data
+
+
+### raw count
+
+We are now able to allocate socio economic data to voting offices. Let's try to extract some raw count variable of interest
+
+- ind = number of inhabitants
+- men = number of households
+- men_pauv = number of poor households
+- men_mais = number of househoulds living in houses
+- men_prop = number of housholds with property
+- log_soc = number of households in social sector
+- ind_snv = sun of incomes
+- ind_18_24 = population aged 18-24
+- ind_25_39 = population aged 25-39
+- ind_40_54 = population aged 40-54
+- ind_55_64 = population aged 55-64   
+- ind_65_79 = population aged 65-79                       
+- ind_80p = population aged 80 and more 
+
+```{r, eval=F}
+
+bv_don <- x %>% 
+           group_by(bvocode) %>%
+           summarise(ind = sum(ind),
+                     men = sum(men),
+                     men_pauv = sum(men_pauv),
+                     men_mais = sum(men_mais),
+                     men_prop = sum(men_prop),
+                     log_soc = sum(log_soc),
+                     ind_snv = sum(ind_snv),
+                     ind_18_24 = sum(ind_18_24),
+                     ind_25_39 = sum(ind_25_39),
+                     ind_40_54 = sum(ind_40_54),
+                     ind_55_64 = sum(ind_55_64),   
+                     ind_65_79 = sum(ind_65_79),                       
+                     ind_80p = sum(ind_80p)                     
+                     ) %>% 
+                     mutate(ind_18p = ind_18_24+ind_25_39+ind_40_54+ind_55_64+ind_65_79+ind_80p) %>%
+  st_drop_geometry()
+```
+
+
+### Indicators
+
+We can derive from this raw count variables some socio-economic and demographic indicators :
+
+- txpauv = % of poor housholds
+- txmais = % of households living in houses
+- txprop = % of houshold with property
+- txhlm = % of household in social housing
+- revhab = estimated income per capita in €
+- tx1824 = % of 18-24 in population aged 18 and more
+- tx2539 = % of 25-39 in population aged 18 and more
+- tx4054 = % of 40_54 in population aged 18 and more
+- tx5564 = % of 55-64 in population aged 18 and more  
+- tx6579 = % of 65-79 in population aged 18 and more
+- tx80p =  % of 80+ in population aged 18 and more
+
+
+```{r, eval=F}
+bv_don <- bv_don %>% mutate(txpauv = 100*men_pauv/men,
+                            txmais = 100*men_mais/men,
+                            txprop = 100*men_prop/men,
+                            txhlm = 100*log_soc/men,
+                            revhab = ind_snv/ind,
+                            tx1824 = 100*ind_18_24/ind_18p,
+                            tx2539 = 100*ind_25_39/ind_18p,                                            tx4054 = 100*ind_40_54/ind_18p,
+                            tx5564 = 100*ind_55_64/ind_18p,                                            tx6579 = 100*ind_65_79/ind_18p,
+                            tx80p = 100*ind_80p/ind_18p,           
+                            )
+```
+
+
+### Linkage with electoral data
+
+We merge the socio-economic data with electoral data of presidential election 2022 and save the resulting file.
+
+```{r, eval=FALSE}
+bv <- bv %>% left_join(bv_don)
+saveRDS(bv, "map/bv38/bv38_soceco.RDS")
+```
+
+## (C) Application I : Ecological analysis of abstention
+
+Let's consider the case of the abstention rate by voting office. We eliminate the case of voting office with less than 20 register or less than 50 inhabitants. We propose here to verify the correlation between the target variables and classical indicators used generally in survey at individual level. The idea here is to verify if the ecological analysis show the same conclusion despite the fact that we are  not using individual informations.
+
+```{r}
+map <-readRDS("map/bv38/bv38_soceco.RDS") %>% filter(ind>50, ins >20)
+map$Y <- 100*(map$ins-map$vot)/map$ins
+```
+
+
+### Income
+
+```{r}
+ggplot(map) + aes(x=revhab, y = Y) + 
+  geom_point() + 
+  geom_smooth(col="red",fill = NA, method="lm") + 
+  scale_x_continuous("Income/inhabitants (€)") +
+  scale_y_continuous("Abstention rate (%)") 
+  ggtitle("Abstention rate and income in Isère",
+          subtitle = "Presidential election of 2022") +
+  theme_light()
+  
+```
+
+- **Comment** : The ecological analysis confirms the well-known result of a negative relation (non-linear) between abstention and income. The granularity of data is sufficient to conclude that the relation is probably not too much biased and would probably remain true at individual level.
+
+### Property of house
+
+```{r}
+
+ggplot(map) + aes(x=txprop, y = Y) + 
+  geom_point() + 
+  geom_smooth(col="red",fill = NA,method = "lm") + 
+  scale_x_continuous("% of property owners") +
+  scale_y_continuous("Abstention rate (%)") 
+  ggtitle("Abstention and house property",
+          subtitle = "Presidential election of 2022") +
+  theme_light()
+  
+```
+
+
+- **Comment** : The share of property owners is negatively correlated with abstention. Is it just an effect of income level ?
+
+### Living in HLM (social sector)
+
+```{r}
+
+ggplot(map) + aes(x=txhlm, y = Y) + 
+  geom_point() + 
+  geom_smooth(col="red",fill = NA,method = "lm") + 
+  scale_x_continuous("% of household in HLM") +
+  scale_y_continuous("Abstention rate (%)") 
+  ggtitle("Abstention and HLM ",
+          subtitle = "Presidential election of 2022") +
+  theme_light()
+  
+```
+- **Comment** : The share of people living in HLM (social housing) is positively correlated with abstention which is a classical resultn to some extent related to income.
+
+
+
+### Young elector (18-24 years old)
+
+```{r}
+map$young <- map$tx1824
+ggplot(map) + aes(x=young, y = Y) + 
+  geom_point() + 
+  geom_smooth(col="red",fill = NA,method = "lm") + 
+  scale_x_continuous("% of 18-39 in adult population") +
+  scale_y_continuous("Abstention rate (%)") 
+  ggtitle("Abstention rate and young (18-39)",
+          subtitle = "Presidential election of 2022") +
+  theme_light()
+  
+```
+- **Comment** : The share of very young electors is positively correlated with abstention but the relation is rather low.
+
+### Old electors (65 years old and more)
+
+```{r}
+map$old<-map$tx6579+map$tx80p
+ggplot(map) + aes(x=old, y = Y) + 
+  geom_point() + 
+  geom_smooth(col="red",fill = NA,method = "lm") + 
+  scale_x_continuous("% of 65+ in adult population") +
+  scale_y_continuous("Abstention rate (%)") 
+  ggtitle("Abstention rate and old (65+)",
+          subtitle = "Presidential election of 2022") +
+  theme_light()
+  
+```
+
+- **Comment** : The share of old electors is negatively correlated with abstention but the relation is rather low.
+
+### Multiple regression
+
+Multiple regression make possible to examine the effects of explanatory variables, all thingsbeing equal with the others. It is particularly important in the case of the variable related to property owners which move from positive to negative correlation when income is controlled. 
+
+```{r}
+don <- map %>% st_drop_geometry() %>% select(Y, revhab, txprop, txhlm, young, old)
+mod <- lm(formula = Y~ revhab+txprop +txhlm+ young+old , data=don)
+summary(mod)
+```
+
+- **Comment** : The most significant explanaory variable is the average income of inhabitant. The fact to be owner of a property produce also a decrease of abstention when it is combined with other explanatory variables. Abstention is higher than expected for young electors and people living in HLM. Old people is the only variable that it is not really significant. But its effect is rather an increase of abstention, all things being equal. 
