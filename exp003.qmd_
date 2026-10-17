@@ -1,6 +1,6 @@
 ---
 title: "Allocation of grid data to voting offices"
-subtitle: "Prelimlinary statistical explorations"
+subtitle: "The example of Isère"
 date: 2026-11-09
 author: "Claude Grasland"
 format: 
@@ -150,7 +150,7 @@ bv <- bv %>% left_join(bv_don)
 saveRDS(bv, "map/bv38/bv38_soceco.RDS")
 ```
 
-## (C) Application I : Ecological analysis of abstention
+## (C) Example  I : Ecological modelling of abstention
 
 Let's consider the case of the abstention rate by voting office. We eliminate the case of voting office with less than 20 register or less than 50 inhabitants. We propose here to verify the correlation between the target variables and classical indicators used generally in survey at individual level. The idea here is to verify if the ecological analysis show the same conclusion despite the fact that we are  not using individual informations.
 
@@ -256,3 +256,5 @@ summary(mod)
 ```
 
 - **Comment** : The most significant explanaory variable is the average income of inhabitant. The fact to be owner of a property produce also a decrease of abstention when it is combined with other explanatory variables. Abstention is higher than expected for young electors and people living in HLM. Old people is the only variable that it is not really significant. But its effect is rather an increase of abstention, all things being equal. 
+
+

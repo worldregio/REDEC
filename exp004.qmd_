@@ -1,0 +1,310 @@
+---
+title: "Analyse écologique des déterminants de l'abstention"
+subtitle: "Application aux cas de l'Isère, du Maine-et-Loire, de la Somme et du Val-de-Marne"
+date: 2026-11-09
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    warning: false
+    comments: false
+---
+
+
+```{r, echo=FALSE}
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+library(ggrepel)
+library(knitr)
+library(gtsummary)
+library(DT)
+library(RColorBrewer)
+```
+
+
+
+
+## Objectif
+
+Nous proposons de reprendre et développer la méthode d'analyse écologique proposée par Souidi et Vonderscher dans la nouvelle cartographie électorale de la France en mobilisant davantage de variables explicatives que le seul revenu.
+
+## (A) Données
+
+Nous avons pour quatre départements procédé à une intersection entre la géométrie des bureaux de vote (simplifiée par application de la méthode de Voronoï) et la grille de population à 200m de l'INSEE. L'adéquation est évidemment imparfaite mais elle permet de mettre approximativement en relation les résultats électoraux de l'élection présidentielle de 2022 et les caractéristiques économiques et sociales des bureaux de votes.
+
+```{r}
+bv03 <- readRDS("map/bv03/bv03_soceco.RDS")
+bv38 <- readRDS("map/bv38/bv38_soceco.RDS")
+bv49 <- readRDS("map/bv49/bv49_soceco.RDS")
+bv80 <- readRDS("map/bv80/bv80_soceco.RDS")
+bv94 <- readRDS("map/bv94/bv94_soceco.RDS")
+bv<- rbind(bv03,bv38, bv49, bv80, bv94)
+bv$txabs <- 100*(1-bv$vot/bv$ins)
+
+
+bvp03 <- readRDS("map/bv03/mapbv_inscrits.RDS")
+bvp38 <- readRDS("map/bv38/mapbv_inscrits.RDS")
+bvp49 <- readRDS("map/bv49/mapbv_inscrits.RDS")
+bvp80 <- readRDS("map/bv80/mapbv_inscrits.RDS")
+bvp94 <- readRDS("map/bv94/mapbv_inscrits.RDS")
+bvp<- rbind(bvp03,bvp38, bvp49, bvp80, bvp94) %>% 
+           select(bvocode, geometry) %>%
+           left_join(st_drop_geometry(bv))
+
+
+com03 <- readRDS("map/bv03/mapcom.RDS")
+com38 <- readRDS("map/bv38/mapcom.RDS")
+com49 <- readRDS("map/bv49/mapcom.RDS")
+com80 <- readRDS("map/bv80/mapcom.RDS")
+com94 <- readRDS("map/bv94/mapcom.RDS")
+com <- rbind(com03,com38,com49, com80, com94)
+
+
+com03 <- readRDS("map/bv03/mapcom_inscrits.RDS")
+com38 <- readRDS("map/bv38/mapcom_inscrits.RDS")
+com49 <- readRDS("map/bv49/mapcom_inscrits.RDS")
+com80 <- readRDS("map/bv80/mapcom_inscrits.RDS")
+com94 <- readRDS("map/bv94/mapcom_inscrits.RDS")
+comp <- rbind(com03,com38,com49, com80, com94)
+```
+
+```{r}
+x <- bv %>% st_drop_geometry() %>%
+       group_by(depcode, depname) %>%
+       summarise( nbhab = sum(ind, na.rm=T),
+                  nb18p = round(sum(ind_18p, na.rm=T)),
+                  nbv = n(), 
+                  nbins = sum(ins, na.rm=T),
+                  nbvot = sum(vot, na.rm=T),
+                  nbhab = sum(ind, na.rm=T)) %>%
+                  mutate(txins = 100*nbins/nb18p,
+                         txpar = 100*nbvot/nbins)
+kable(x,col.names = c("code","nom","Pop.tot.", "Pop. > 18", "Nb. BV", "Inscrits", "Votants", "Ins/Pop>18","Vot/Ins"), digits=c(0,0,0,0,0,0,0,1,1))
+```
+
+
+
+
+
+## (B) Géographie de l'abstention
+
+Examinons rapidement la géographie de l'abstention dans les quatre départements. On réalise pour cela des cartes par bureaux de votes montrant la distribution du phénomène soit dans l'espace géographique (taille proportionnelle à la superficie), soit dans l'espace politique (taille proportionnelle au nombre d'inscrit). La seconde visualisation permet de mieux saisir l'originalité des espaces urbains qui rassemblent beaucoup plus de citoyens mais ont en général un taux d'abstention nettement plus élevé. 
+
+
+### Isère (38)
+
+```{r}
+mydep <-"38"
+myvar <- "txabs"
+mypal <- rev(brewer.pal(n = 5,name = "RdYlBu"))
+mytitle = "Abstention, 2022"
+
+par(mfrow=c(1,2))
+# Carte géométrique
+bvsel <- bv %>% filter(depcode==mydep) 
+comsel <- com %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / surface") ,
+          credits = "ANR REDEC, 2026",
+          scale = T,
+          frame=T,
+          arrow = F)
+
+# Carte démographique
+bvsel <- bvp %>% filter(depcode==mydep) 
+comsel <- comp %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / inscrits"),
+          credits = "ANR REDEC, 2026",
+          scale = F,
+          frame=T,
+          arrow = F)
+```
+
+
+
+
+### Maine-et-Loire (49)
+
+```{r}
+mydep <-"49"
+myvar <- "txabs"
+mypal <- rev(brewer.pal(n = 5,name = "RdYlBu"))
+mytitle = "Abstention, 2022"
+
+par(mfrow=c(1,2))
+# Carte géométrique
+bvsel <- bv %>% filter(depcode==mydep) 
+comsel <- com %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / surface") ,
+          credits = "ANR REDEC, 2026",
+          scale = T,
+          frame=T,
+          arrow = F)
+
+# Carte démographique
+bvsel <- bvp %>% filter(depcode==mydep) 
+comsel <- comp %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / inscrits"),
+          credits = "ANR REDEC, 2026",
+          scale = F,
+          frame=T,
+          arrow = F)
+```
+
+
+
+### Somme (80)
+
+```{r}
+mydep <-"80"
+myvar <- "txabs"
+mypal <- rev(brewer.pal(n = 5,name = "RdYlBu"))
+mytitle = "Abstention, 2022"
+
+par(mfrow=c(1,2))
+# Carte géométrique
+bvsel <- bv %>% filter(depcode==mydep) 
+comsel <- com %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / surface") ,
+          credits = "ANR REDEC, 2026",
+          scale = T,
+          frame=T,
+          arrow = F)
+
+# Carte démographique
+bvsel <- bvp %>% filter(depcode==mydep) 
+comsel <- comp %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / inscrits"),
+          credits = "ANR REDEC, 2026",
+          scale = F,
+          frame=T,
+          arrow = F)
+```
+
+### Val-de-Marne (94)
+
+```{r}
+mydep <-"94"
+myvar <- "txabs"
+mypal <- rev(brewer.pal(n = 5,name = "RdYlBu"))
+mytitle = "Abstention, 2022"
+
+par(mfrow=c(1,2))
+# Carte géométrique
+bvsel <- bv %>% filter(depcode==mydep) 
+comsel <- com %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / surface") ,
+          credits = "ANR REDEC, 2026",
+          scale = T,
+          frame=T,
+          arrow = F)
+
+# Carte démographique
+bvsel <- bvp %>% filter(depcode==mydep) 
+comsel <- comp %>% filter(substr(comcode,1,2)==mydep) 
+mybreak<- quantile(bvsel[[myvar]], probs=c(0,0.2,0.4,0.6,0.8,1), na.rm=T)
+mf_map(bvsel, 
+       var=myvar, 
+       type="choro", 
+       breaks=mybreak, 
+       pal=mypal,
+       leg_title = "%",
+       leg_val_rnd = 1,
+       lwd=0.1,
+       border="white"
+       )
+mf_map(comsel, type="base",lwd=0.5, col = NA, add=T)
+mf_layout(title = paste(mytitle," / inscrits"),
+          credits = "ANR REDEC, 2026",
+          scale = F,
+          frame=T,
+          arrow = F)
+```
+

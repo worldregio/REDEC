@@ -7,7 +7,7 @@ website:
     left:
       - href: index.qmd
         text: "Home"
-      - text: Geomatic backoffice
+      - text: Case studies
         menu:
           - href: case03.qmd  
             text: "Allier (03)"          
@@ -37,6 +37,10 @@ website:
             text: "Redistricting with k-means in demographic space"   
           - href: exp002.qmd  
             text: "Distribution of seats by departement for Assemblée Nationale and Senat"
+      - text: Tasks
+        menu:
+          - href: taskE1.qmd  
+            text: "task E.1 : Géométries politiques"
     right: 
       - icon: github # add icons as navbar buttons
         href: https://github.com/worldregio/SMA

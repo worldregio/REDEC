@@ -1,0 +1,392 @@
+---
+title: "REDEC tâche E.1 : Géometries politiques "
+subtitle: "Experiences sur le Val-de-Marne"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    message: false
+    comment: false
+    warning: false
+---
+
+
+```{r, echo=FALSE, }
+library(sf)
+library(mapsf)
+library(dplyr)
+library(leaflet)
+library(ggplot2)
+library(data.table)
+library(rmapshaper)
+```
+
+
+## (A) Objectifs
+
+Le but de la tâche E.1 est de reconstruire la géométrie de l'ensemble des maillages politiques (communes, cantons, circonscriptions, départements) à partir de la brique de base constituée par les bureaux de votes. Plusieurs difficultés doivent être résolus :
+
+1. **Choix de la date de référence** : la carte des bureaux de vote est en évolution constante et peut changer d'une élection à une autre, généralement par ajout de nouveaux bureaux de vote. En première analyse, on prendra comme référence les élections présidentielles et législatives de 2022. 
+
+2. **Incertitudes sur la géométrie des bureaux de vote** : il n'existe pas de cartographie précise des contours des bureaux de vote mais une simple liste de rues, sections de trottoirs rattachées à tel ou tel bureau de vote. L'INSEE a proposé une première cartographie des bureaux de vote à partir du fichier des adresses des votants mais ces géométries semblent comporter beaucoup d'erreurs ou d'irrégularités.
+
+3. **Simplification des limites** : On souhaite disposer d'un fichier simplifié des contours des bureaux de vote afin de pouvoir plus facilement en déduire leur topologie et effectuer des transformations de type cartogramme (modification des surfaces pour les rendre proportionnelles au nombre d'inscrit). Mais cette simplification doit être aussi juste que possible et ne pas altérer les limites connues avec certitude.
+
+## (B) Sources
+
+### La carte des bureaux de vote de l'INSEE (sept.2022)
+
+L'INSEE a établi pour la première fois en 2022 une cartographie complète des bureaux de vote en France en se servant du répertoire électoral unique (REU) et de la base des adresses nationales (BAN). La méthodologie rigoureuse est présentée en détail dans le billet de blog publié le 28 juin 2023 et intitulé [« A voté » : à chaque bureau de vote ses électeurs](https://blog.insee.fr/a-vote-a-chaque-bureau-de-vote-ses-electeurs/). 
+
+Ce découpage est a priori en adéquation avec notre objectif puisqu'il est fondé sur la situation des fichiers électoraux en **septembre 2022**, soit juste après les élections législatives et présidentielles qui ont eu lieu cette année-là.
+
+### Le package mapvotR 
+
+Il est toutefois possible de refaire les analyses à la même date ou à une date ultérieure puisque l'INSEE a également mis à disposition l'ensemble des programmes permettant d'établir le découpage en bureaux de vote sous la forme d'un package R appelé [mapvotR](https://inseefrlab.github.io/mapvotr/articles/mapvotr.html)
+
+### Relation entre bureaux de votes et circonscriptions
+
+Les résultats détaillés des élections présidentielles de 2022 par bureau de vote peuvent être utilisés pour établir la table de correspondance avec les bureaux de vote et ainsi donner la clé d'agrégation des géométries. La source est accessible sans difficultés sur le site [data.gouv.fr](https://www.data.gouv.fr/datasets/election-presidentielle-des-10-et-24-avril-2022-resultats-definitifs-du-1er-tour)
+
+
+
+### Relation entre bureaux de vote et élections depuis 1999 (!)
+
+Un fichier a première vue extraordinaire vient d'être récemment publié qui donne les résultats par bureau de vote pour toutes les élections en France depuis 1999. Les numéros des bureaux de vote ne correspondent évidemment pas toujours d'une élection à l'autre, mais c'est tout de même une source assez fabuleuse à explorer : [Données des élections agrégées](https://www.data.gouv.fr/datasets/donnees-des-elections-agregees?tab=data-structure)
+
+### Relation entre bureaux de vote et cantons
+
+Les dernières éléctions cantonales de 2021 utilisent des bureaux de votes qui ne coïncident pas forcément avec ceux de 2022. On devra donc utiliser une méthode plus approximative (intersection géographique) pour les reconstituer approximativement dans le découpage de 2022.
+
+
+## (C) Simplification des bureaux de vote par commune
+
+
+```{r}
+bv <- readRDS("map/bv94/mapbv.RDS") %>% st_transform(2154)
+com<-bv %>% group_by(comcode, comname) %>% summarise()
+#plot(com$geometry)
+```
+
+Comment simplifier les contours des bureaux de vote d'une commune sans modifier les frontières externes de celle-ci ? Le problème n'est pas évident comme on va le voir et plusieurs solutions sont possibles...Prenons d'abord un cas simple avec l'exemple d'Ablon
+
+```{r}
+
+mycom<-94001
+myname<-"Ablon"
+
+selbv <- bv %>% filter(comcode==mycom) %>% 
+            select(comcode, bvonum) %>%
+            arrange(bvonum) %>%
+            mutate(bvorder = 1:length(bvonum))
+
+
+
+selcom <- com %>% filter(comcode==mycom) %>% select(comcode)
+
+mf_map(selbv, type="typo", var="bvonum", alpha=0.5)
+mf_map(selcom, type="base",col=NA, border="black", lwd=2, add=T)
+mf_layout(paste0("Bureaux de vote : ",myname, " (",mycom,")"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+### Etapes de simplification
+
+On peut utiliser le package `rmapshaper` pour généraliser le fonds de carte de façon très satisfaisante mais avec un inconvénient majeur qui est la déormation de la limite externe de la commune.
+
+```{r}
+selbv2<-ms_simplify(selbv,keep = 0.1)
+
+mf_map(selbv2, type="typo", var="bvonum", alpha=0.5)
+mf_map(selcom, type="base",col=NA, border="red", lwd=1, add=T)
+mf_layout(paste0("Etape 1 : Simplification des contours"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+
+Il est assez facile de supprimer les morceaux extérieurs ... au contour...
+
+```{r}
+selbv3<-ms_clip(target=selbv2, clip=selcom)
+
+mf_map(selbv3, type="typo", var="bvonum", alpha=0.5)
+mf_map(selcom, type="base",col=NA, border="red", lwd=1, add=T)
+mf_layout(paste0("Etape 2 : élimination des zones externes"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+Il est en revanche un peu plus compliqué de combler les vides...
+
+```{r}
+# A helper function that erases all of y from x:
+st_erase = function(x, y) st_difference(x, st_union(st_combine(y)))
+sub<-st_erase(selcom,selbv3)
+
+# Split multipolygon in simple polygon
+sub<-st_cast(sub,"POLYGON")
+
+# Find intersections with geometries
+x<-st_intersects(sub,selbv3)
+first<-function(x){x[1]}
+sub$bvorder<-as.numeric(lapply(x,first))
+
+# Add bvonum
+t<- st_drop_geometry(selbv)
+sub<-sub %>% left_join(t) %>% select(comcode,bvonum, bvorder, geometry)
+
+# bind with selbv3
+ selbv4 <- rbind(selbv3, sub) %>% group_by(comcode, bvonum) %>% summarise()
+
+
+
+mf_map(selbv4, type="typo", var="bvonum", alpha=0.5)
+mf_map(selcom, type="base",col=NA, border="red", lwd=1, add=T)
+mf_layout(paste0("Etape 3 : ajout des zones internes manquantes"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+```
+
+
+### Création d'une fonction
+
+On reprend les étapes précédentes pour en faire une fonction unique prenant en entrée les contours des bureaux de vote d'une commune.
+
+```{r}
+bv_simplify <- function(allbv = bv,
+                        mycom="94001",
+                        simp = 0.1){
+
+  
+  # (0) Extract bv of my commune
+  selbv <- allbv %>% filter(comcode==mycom) %>% 
+            select(comcode, bvonum) %>%
+            arrange(bvonum) %>%
+            mutate(bvorder = 1:length(bvonum))
+  
+  # (1) Create commune border
+  selcom<- selbv %>% summarise()
+  
+  # (2) Simplify
+  selbv2<-ms_simplify(selbv,keep = simp)
+  
+  # (3) Eliminate external area
+  selbv3<-ms_clip(target=selbv2, clip=selcom)
+  
+  # (4) reaffect internal area
+    # A helper function that erases all of y from x:
+   st_erase = function(x, y) st_difference(x, st_union(st_combine(y)))
+   sub<-st_erase(selcom,selbv3)
+
+   # Split multipolygon in simple polygon
+   sub<-st_cast(sub,"POLYGON")
+
+   # Find intersections with geometries
+   x<-st_intersects(sub,selbv)
+   first<-function(x){x[1]}
+   sub$bvorder<-as.numeric(lapply(x,first))
+
+   # Add bvonum
+   t<- st_drop_geometry(selbv)
+   sub<-sub %>% left_join(t) %>% 
+     select(comcode,bvonum, bvorder, geometry)
+   
+   # bind with selbv3
+   selbv4 <- rbind(selbv3, sub) %>% 
+     group_by(comcode, bvonum) %>%
+     summarise()
+
+return(selbv4)
+}
+
+```
+
+
+On teste la fonction sur l'exemple précédent :
+
+```{r}
+par(mfrow=c(1,2))
+
+x<-bv %>% filter(comcode==94001)
+c <- x %>% group_by(comcode) %>% summarise()
+mf_map(x, type="typo", var="bvonum", alpha=0.5, leg_pos = NA)
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_layout(paste0("Carte de départ"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+m<-bv_simplify(mycom=94001,allbv = bv,simp = 0.1)
+
+mf_map(m, type="typo", var="bvonum", alpha=0.5, leg_pos = NA)
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+
+### Exemple de Sucy-en-Brie
+
+
+```{r}
+macom<-94071
+myname<-"Sucy-en-Brie"
+
+par(mfrow=c(1,2))
+
+x<-bv %>% filter(comcode==macom) %>% mutate(num=as.numeric(bvonum))
+c <- x %>% group_by(comcode) %>% summarise()
+mf_map(x, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(x, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0(myname), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+m<-bv_simplify(mycom=macom,allbv = bv,simp = 0.05) %>% mutate(num=as.numeric(bvonum))
+
+mf_map(m, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(m, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+- **Commentaire** : La simplification s'opère sans difficultés avec un très bon résultat.
+
+
+### Exemple de Vitry-sur Seine
+
+
+```{r}
+macom<-94081
+myname<-"Vitry-sur-Seine"
+par(mfrow=c(1,2))
+
+x<-bv %>% filter(comcode==macom) %>% mutate(num=as.numeric(bvonum))
+c <- x %>% group_by(comcode) %>% summarise()
+mf_map(x, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(x, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0(myname), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+m<-bv_simplify(mycom=macom,allbv = bv,simp = 0.05) %>% mutate(num=as.numeric(bvonum))
+
+mf_map(m, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(m, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+- **Commentaire** : La simplification est correcte mais il reste quelques bureaux de vote composés de ^polygones multiples.
+
+### Exemple de Saint-Maur-des-Fossés
+
+
+```{r}
+macom<-94068
+myname<-"St-Maur-des-Fossés"
+par(mfrow=c(1,2))
+
+x<-bv %>% filter(comcode==macom) %>% mutate(num=as.numeric(bvonum))
+c <- x %>% group_by(comcode) %>% summarise()
+mf_map(x, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(x, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0(myname), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+m<-bv_simplify(mycom=macom,allbv = bv,simp = 0.05) %>% mutate(num=as.numeric(bvonum))
+
+mf_map(m, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(m, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+
+- **Commentaire** : La simplification n'est pas suffisante mais la carte de depart était franchement pourrie... On va donc essayer de forcer un peu plus le paramètre de simplification.
+
+
+```{r}
+macom<-94068
+myname<-"St-Maur-des-Fossés"
+par(mfrow=c(1,2))
+
+x<-bv %>% filter(comcode==macom) %>% mutate(num=as.numeric(bvonum))
+c <- x %>% group_by(comcode) %>% summarise()
+mf_map(x, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(x, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0(myname), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+m<-bv_simplify(mycom=macom,allbv = bv,simp = 0.01) %>% mutate(num=as.numeric(bvonum))
+
+mf_map(m, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(m, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+- **Commentaire** : même en poussant la généralisation, on n'arrive pas à résoudre le problème. Il faudra ici procéder de façon manuelle ou revoir les paramètres de l'algorithme de simplification. Et éventuellement repartir du programme de création des zones par l'INSEE.
+
+
+### Exemple d'Alfortville
+
+
+```{r}
+macom<-94002
+myname<-"Alfortville"
+par(mfrow=c(1,2))
+
+x<-bv %>% filter(comcode==macom) %>% mutate(num=as.numeric(bvonum))
+c <- x %>% group_by(comcode) %>% summarise()
+mf_map(x, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(x, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0(myname), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+
+m<-bv_simplify(mycom=macom,allbv = bv,simp = 0.01) %>% mutate(num=as.numeric(bvonum))
+
+mf_map(m, type="base", col="lightyellow")
+mf_map(c, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(m, var="num",cex = 0.5,overlap = F)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+- **Commentaire** : Un autre exemple de carte particulièrement problématique, notamment dans la partie Nord de la commune où l'on assiste à un morcellement des bureaux de vote en microzones. L'analyse par photo aérienne ne permet pas de comprendre pourquoi ...
+
+```{r}
+library(mapview)
+mapview(m,zcol="bvonum",
+        map.types=c("Esri.WorldImagery"))
+```
+
+
+
+
+
+
+## (D) Application à l'ensemble du Val-de-Marne
+
+On lance une boucle de calcul pour appliquer la fonction de simplification à tout le Val-de-Marne.
+
+### Boucle de calcul
+
+```{r}
+
+
+listcom<-unique(bv$comcode)
+k<-length(listcom)
+
+t1<-Sys.time()
+m0<-bv_simplify(allbv=bv,mycom = listcom[1],simp = 0.01)
+for (i in 2:k){
+#  print(i)
+  m<-bv_simplify(allbv=bv,mycom = listcom[i],simp = 0.01)
+  m0<-rbind(m0,m)
+}
+t2<-Sys.time()
+paste("Temps d'execution : ",t2-t1, "Secondes")
+```
+
+### Visualisation du résultat
+
+```{r}
+
+mf_map(m0, type="typo", var="comcode",leg_pos=NA, alpha=0.2, lwd=0.4)
+mf_map(com, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(com, var="comcode",cex = 0.5,overlap = F, halo=T)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
+- **Commentaire** : la carte permet de repérer assez rapidement les communes où l'opération de simplification s'est bien passée (comme à Vitry-sur-Seine) et celles où on voit qu'il y aura besoin de retoucher les contours (comme à Saint-Maur-des-Fossés)
+
