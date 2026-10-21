@@ -1,0 +1,183 @@
+---
+title: "Evolution des géométries politiques"
+subtitle: "Le cas de la Somme (80)"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    comments: false
+    warning: false
+---
+
+
+```{r, echo=FALSE}
+library(sf, quietly = T, verbose=F,warn.conflicts = F)
+library(mapsf, quietly = T, verbose=F,warn.conflicts = F)
+library(dplyr, quietly = T, verbose=F,warn.conflicts = F)
+library(data.table, quietly = T, verbose=F,warn.conflicts = F)
+library(leaflet, quietly = T, verbose=F,warn.conflicts = F)
+library(rmapshaper)
+library(knitr)
+```
+
+## Objectif
+
+On se propose d'examiner les modifications de la géométrie politique du département entre 2007 et 2022 en se servant des données CARTELEC pour la description de la situation avant 2010 et des données INSEE pour la situation actuelle en 2022.
+
+
+## (A) Bureaux de vote
+
+
+### Evolution du nombre 
+
+Quel est le nombre de bureaux de vote à chacune des dates ? quelles évolutions observe-t-on dans les communes les plus découpées ?
+
+```{r}
+bv1 <- st_read("map/bv80/cartelec80.geojson")
+bv2 <- readRDS("map/bv80/mapbv.RDS")
+date=c(2007,2022)
+source <-c("CARTELEC","INSEE ")
+nb<-c(dim(bv1)[1],dim(bv2)[1])
+tab<-data.frame(date,source,nb)
+kable(tab)
+
+```
+
+
+```{r}
+t1 <- bv1 %>% st_drop_geometry() %>%
+  group_by(code=CODE) %>%
+  summarise(nb1=n()) 
+t2 <- bv2 %>% st_drop_geometry() %>%
+  group_by(code=comcode, nom=comname) %>%
+  summarise(nb2=n())
+t<-t1 %>% left_join(t2) %>% select(code,nom,nb1,nb2) %>% mutate(var=nb2-nb1) %>% arrange(-nb2)
+
+kable(head(t,8))
+```
+
+- **Commentaire** : Il y a une légère réduction des bureaux de vot sans doute liée à des fusions de communes. Mais dans les communes périurbaines en croissance on observe au contraire l'apparition de  nouveaux bureaux de vote
+
+
+
+## (B) Cantons
+
+
+### Situation avant 2015
+
+```{r}
+
+c1 <- bv1 %>% group_by(CODECANT) %>% summarise()
+n1 <-dim(c1)[1]
+c1 <-st_simplify(c1,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, leg_pos=NA)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.5, halo = T)
+mf_layout(paste("Les", n1, "cantons jusqu'en 2015"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+### Situation après 2015
+
+```{r}
+
+c2 <- bv2 %>% group_by(cannum) %>% summarise()
+n2 <-dim(c2)[1]
+c2 <-st_simplify(c2,dTolerance = 20)
+mf_map(c2, type="typo",var="cannum",alpha = 0.5, leg_pos=NA)
+mf_label(c2,var="cannum",overlap = F, cex=0.5, halo = T)
+mf_layout(paste("Les", n2, "cantons après 2015"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+## Fusion ou redécoupage ?
+
+Comment s'est opéré la réduction de moitié des cantons ?
+
+```{r}
+c1 <- bv1 %>% group_by(CODECANT) %>% summarise()
+c1 <-st_simplify(c1,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, leg_pos=NA,lwd=0.4)
+
+mf_map(c2,type="base",col=NA, border="red",lwd=2,add=T)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.4, halo = F)
+mf_label(c2,var="cannum",overlap = F, cex=0.8, halo = T,col="red")
+mf_layout("Fusions et redécoupages des cantons",
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+
+```
+- **Commentaire** : Compte-tenu des variations de la croissance de population, le nombre de cantons fusionnés est très variable. Dans les zones rurales périphériques, on a souvent fusionné 3 voire 4 cantons. Au contraire, dans les zones denses et en croissance, le nombre de cantons a pu être plus faible. Mais dans tous les cas on a beaucoup chamboulé les limites antérieures.
+
+
+
+
+## (C) Circonscriptions
+
+Le redécoupage des circonscriptions s'est opéra en principe à partir de la brique de base des anciens cantons.
+
+### Situation avant 2010
+
+```{r}
+
+d1 <- bv1 %>% group_by(CIRCO) %>% summarise()
+n1 <-dim(d1)[1]
+d1 <-st_simplify(d1,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, border="white",leg_pos=NA)
+mf_map(d1,type="base",col=NA, border="red",lwd=2,add=T)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.5)
+mf_label(d1,var="CIRCO",overlap = F, cex=0.8, halo = T,col="red")
+mf_layout(paste("Circonscriptions et cantons avant 2010"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+
+- **Commentaire** : il y avait 6 circonscriptions en 2015, avec déjà un charcutage poussé de la capitale.
+
+
+
+### Situation en 2010-2015
+
+```{r}
+w<-d1 %>% filter(CIRCO=="04")
+w$CIRCO<-"Suppr."
+d2 <- bv2 %>% mutate(CIRCO=substr(circode,3,4)) %>%group_by(CIRCO) %>% summarise()
+n2 <-dim(d2)[1]
+d2 <-st_simplify(d2,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, border="white",leg_pos=NA)
+mf_map(d2,type="base",col=NA, border="red",lwd=2,add=T)
+mf_map(w, type="base", col="blue", alpha=0.5,lwd=1,lty=2, border="blue",add=T)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.5)
+mf_label(d2,var="CIRCO",overlap = F, cex=0.8, halo = T,col="red")
+
+mf_label(w,var="CIRCO",overlap = F, cex=0.8, halo = T,col="blue")
+
+mf_layout(paste("Situation en 2010-2015"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+- **Commentaire** : la suppression de l'ancienne 4e circonscriptionentraîne un redécoupage générale de toute la carte, même si on peut repérer un certain nombre de permanences, par exemple pour la 5e et la 2e.
+
+
+### Situation depuis 2015
+
+```{r}
+
+d2 <- bv2 %>% mutate(CIRCO=substr(circode,3,4)) %>%group_by(CIRCO) %>% summarise()
+n2 <-dim(d2)[1]
+d2 <-st_simplify(d2,dTolerance = 20)
+mf_map(c2, type="typo",var="cannum",alpha = 0.5, border="white",leg_pos=NA)
+mf_map(d2,type="base",col=NA, border="red",lwd=2,add=T)
+mf_label(c2,var="cannum",overlap = F, cex=0.5)
+mf_label(d2,var="CIRCO",overlap = F, cex=0.8, halo = T,col="red")
+mf_layout(paste("Circonscriptions et cantons en  2022"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+- **Commentaire** : sous le double effet des deux réformes, il n'y a presque plus de correspondances entre les limites de canton et de circonscriptions
+

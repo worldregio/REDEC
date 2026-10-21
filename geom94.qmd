@@ -1,0 +1,284 @@
+---
+title: "Evolution des géométries politiques"
+subtitle: "Le cas du Val-de-Marne (94)"
+author: "Claude Grasland"
+format: 
+  html:
+    embed-resources: true
+    echo: false
+    comments: false
+    warning: false
+---
+
+
+```{r, echo=FALSE}
+library(sf, quietly = T, verbose=F,warn.conflicts = F)
+library(mapsf, quietly = T, verbose=F,warn.conflicts = F)
+library(dplyr, quietly = T, verbose=F,warn.conflicts = F)
+library(data.table, quietly = T, verbose=F,warn.conflicts = F)
+library(leaflet, quietly = T, verbose=F,warn.conflicts = F)
+library(rmapshaper)
+library(knitr)
+```
+
+## Objectif
+
+On se propose d'examiner les modifications de la géométrie politique du département entre 2007 et 2022 en se servant des données CARTELEC pour la description de la situation avant 2010 et des données INSEE pour la situation actuelle en 2022.
+
+
+## (A) Bureaux de vote
+
+
+### Evolution du nombre 
+
+Quel est le nombre de bureaux de vote à chacune des dates ? quelles évolutions observe-t-on dans les communes les plus découpées ?
+
+```{r}
+bv1 <- st_read("map/bv94/cartelec94.geojson")
+bv2 <- readRDS("map/bv94/mapbv.RDS")
+date=c(2007,2022)
+source <-c("CARTELEC","INSEE ")
+nb<-c(dim(bv1)[1],dim(bv2)[1])
+tab<-data.frame(date,source,nb)
+kable(tab)
+
+```
+
+
+```{r}
+t1 <- bv1 %>% st_drop_geometry() %>%
+  group_by(code=CODE) %>%
+  summarise(nb1=n()) 
+t2 <- bv2 %>% st_drop_geometry() %>%
+  group_by(code=comcode, nom=comname) %>%
+  summarise(nb2=n())
+t<-t1 %>% left_join(t2) %>% select(code,nom,nb1,nb2) %>% mutate(var=nb2-nb1) %>% arrange(-nb2)
+kable(t)
+```
+
+- **Commentaire** : D'après nos deux sources (mais ont il faut vérifie la fiabilité) il y aurait eu en général un accroissement du nombre de bureaux de vote à l'échelle du département et dans plusieurs communes. Mais on trouve aussi des communes stables et quelques unes en décroissance.
+
+### Stabilité des bureaux de vote
+
+Certaines communes ne semblent pas avoir modifié leurs bureaux de votes.
+
+```{r}
+mycom<-94071
+myname<-"Sucy-en-Brie"
+
+sel1 <- bv1 %>% filter(CODE==mycom) %>% 
+    mutate(bvnum = as.numeric(substr(BUREAU,7,9))) %>%
+  select(bvnum)
+
+sel2 <- bv2 %>% filter(comcode==mycom) %>% 
+  mutate(bvnum = as.numeric(bvonum)) %>%
+  select(bvnum)
+sel<-rbind(sel1,sel2)
+k1<-dim(sel1)[1]
+k2<-dim(sel2)[1]
+sel$mycol<-c(rep("blue",k1),rep("red",k2))
+
+mf_map(sel1, type="base", 
+       col="lightyellow" ,
+       border="blue")
+mf_map(sel2, type="base", 
+       col=NA, border="red",
+       add=T)
+mf_label(sel,var="bvnum", col=sel$mycol,overlap = F)
+mf_layout(paste("Bureaux de vote de ",myname, "en 2007 et 2022"),
+          frame=T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+
+
+```
+
+- **Commentaire** : Dans le cas de certaine communes, on peut considérer qu'il y a eu stabilité du découpage des bureaux de vote. Le fait que les limites ne se superpose pas exactement est lié aux différences de méthodes utilisées par CARTELEC et l'INSEE. Mais les centroïdes sont globalement les mêmes et les numéros de bureau de vote coïncident.
+
+
+
+### Correspondance partielle
+
+D'autres communes ont conservé une partie de leurs bureaux de vote mais en ont ajoutés certains et ont redécoupé des quartiers en croissance.
+
+```{r}
+mycom<-94076
+myname<-"Villejuif"
+
+sel1 <- bv1 %>% filter(CODE==mycom) %>% 
+    mutate(bvnum = as.numeric(substr(BUREAU,7,9))) %>%
+  select(bvnum)
+
+sel2 <- bv2 %>% filter(comcode==mycom) %>% 
+  mutate(bvnum = as.numeric(bvonum)) %>%
+  select(bvnum)
+sel<-rbind(sel1,sel2)
+k1<-dim(sel1)[1]
+k2<-dim(sel2)[1]
+sel$mycol<-c(rep("blue",k1),rep("red",k2))
+
+mf_map(sel1, type="base", 
+       col="lightyellow" ,
+       border="blue")
+mf_map(sel2, type="base", 
+       col=NA, border="red",
+       add=T)
+mf_label(sel,var="bvnum", col=sel$mycol,overlap = F)
+mf_layout(paste("Bureaux de vote de ",myname, "en 2007 et 2022"),
+          frame=T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+
+
+```
+
+### Absence de correspondance
+
+Enfin, dans certaines communes on ne trouve aucune correspondance dans les numéros de bureaux de vote, même si certaines limites coïncident plus ou moins
+
+```{r}
+mycom<-94068
+myname<-"St-Maur-des-Fossés"
+
+sel1 <- bv1 %>% filter(CODE==mycom) %>% 
+    mutate(bvnum = as.numeric(substr(BUREAU,7,9))) %>%
+  select(bvnum)
+
+sel2 <- bv2 %>% filter(comcode==mycom) %>% 
+  mutate(bvnum = as.numeric(bvonum)) %>%
+  select(bvnum)
+sel<-rbind(sel1,sel2)
+k1<-dim(sel1)[1]
+k2<-dim(sel2)[1]
+sel$mycol<-c(rep("blue",k1),rep("red",k2))
+
+mf_map(sel1, type="base", 
+       col="lightyellow" ,
+       border="blue")
+mf_map(sel2, type="base", 
+       col=NA, border="red",
+       add=T)
+mf_label(sel,var="bvnum", col=sel$mycol,overlap = F)
+mf_layout(paste("Bureaux de vote de ",myname, "en 2007 et 2022"),
+          frame=T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+
+
+```
+
+
+
+## (B) Cantons
+
+
+### Situation avant 2015
+
+```{r}
+
+c1 <- bv1 %>% group_by(CODECANT) %>% summarise()
+n1 <-dim(c1)[1]
+c1 <-st_simplify(c1,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, leg_pos=NA)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.5, halo = T)
+mf_layout(paste("Les", n1, "cantons jusqu'en 2015"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+### Situation après 2015
+
+```{r}
+
+c2 <- bv2 %>% group_by(cannum) %>% summarise()
+n2 <-dim(c2)[1]
+c2 <-st_simplify(c2,dTolerance = 20)
+mf_map(c2, type="typo",var="cannum",alpha = 0.5, leg_pos=NA)
+mf_label(c2,var="cannum",overlap = F, cex=0.5, halo = T)
+mf_layout(paste("Les", n2, "cantons après 2015"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+## Fusion ou redécoupage ?
+
+Comment s'est opéré la réduction de moitié des cantons ?
+
+```{r}
+c1 <- bv1 %>% group_by(CODECANT) %>% summarise()
+c1 <-st_simplify(c1,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, leg_pos=NA,lwd=0.4)
+
+mf_map(c2,type="base",col=NA, border="red",lwd=2,add=T)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.4, halo = F)
+mf_label(c2,var="cannum",overlap = F, cex=0.8, halo = T,col="red")
+mf_layout("Fusions et redécoupages des cantons",
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+
+```
+- **Commentaire** : Dans la plupart des cas, les nouveaux cantons résultent de la fusion de deux anciens cantons ce qui est de prime abord plutôt logique. Mais on observe aussi des cas plus complexes de redécoupage, notamment dans le nouveau canton 11 qui a pris des fragments de 5 anciens cantons.
+
+
+## (C) Circonscriptions
+
+Le redécoupage des circonscriptions s'est opéra en principe à partir de la brique de base des anciens cantons.
+
+### Situation avant 2010
+
+```{r}
+
+d1 <- bv1 %>% group_by(CIRCO) %>% summarise()
+n1 <-dim(d1)[1]
+d1 <-st_simplify(d1,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, border="white",leg_pos=NA)
+mf_map(d1,type="base",col=NA, border="red",lwd=2,add=T)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.5)
+mf_label(d1,var="CIRCO",overlap = F, cex=0.8, halo = T,col="red")
+mf_layout(paste("Circonscriptions et cantons avant 2010"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+
+
+
+### Situation en 2010-2015
+
+```{r}
+w<-d1 %>% filter(CIRCO=="07")
+w$CIRCO<-"Suppr."
+d2 <- bv2 %>% mutate(CIRCO=substr(circode,3,4)) %>%group_by(CIRCO) %>% summarise()
+n2 <-dim(d2)[1]
+d2 <-st_simplify(d2,dTolerance = 20)
+mf_map(c1, type="typo",var="CODECANT",alpha = 0.5, border="white",leg_pos=NA)
+mf_map(d2,type="base",col=NA, border="red",lwd=2,add=T)
+mf_map(w, type="base", col="blue", alpha=0.5,lwd=1,lty=2, border="blue",add=T)
+mf_label(c1,var="CODECANT",overlap = F, cex=0.5)
+mf_label(d2,var="CIRCO",overlap = F, cex=0.8, halo = T,col="red")
+mf_label(w,var="CIRCO",overlap = F, cex=0.8, halo = T,col="blue")
+
+mf_layout(paste("Circonscriptions et cantons en 2010-2015"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+
+### Situation depuis 2015
+
+```{r}
+
+d2 <- bv2 %>% mutate(CIRCO=substr(circode,3,4)) %>%group_by(CIRCO) %>% summarise()
+n2 <-dim(d2)[1]
+d2 <-st_simplify(d2,dTolerance = 20)
+mf_map(c2, type="typo",var="cannum",alpha = 0.5, border="white",leg_pos=NA)
+mf_map(d2,type="base",col=NA, border="red",lwd=2,add=T)
+mf_label(c2,var="cannum",overlap = F, cex=0.5)
+mf_label(d2,var="CIRCO",overlap = F, cex=0.8, halo = T,col="red")
+mf_layout(paste("Circonscriptions et cantons en  2022"),
+          frame = T, arrow=F, scale=T,
+          credits = "Grasland C., ANR-REDEC, 2026")
+```
+
+## Discussion
+
+- **Bureaux de vote** : Il semble illusoire de mettre en correspondance les découpages des bureaux de vote établis par CARTELEC pour la période passée et ceux établis récemment par l'INSEE.
+
+- **Cantons et cirsconscriptions** : Il est en revanche possible de mettre en rapport les deux bases de données pour analyser l'effet des deux réformes de 2010 (révision des circonscriptions législatives) et de 2015 (modification des cantons). On pourra ainsi retrouver la manière dont les circonscriptions ont été tracés dans le cadre des anciens cantons.

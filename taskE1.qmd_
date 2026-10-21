@@ -390,3 +390,35 @@ mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR 
 
 - **Commentaire** : la carte permet de repérer assez rapidement les communes où l'opération de simplification s'est bien passée (comme à Vitry-sur-Seine) et celles où on voit qu'il y aura besoin de retoucher les contours (comme à Saint-Maur-des-Fossés)
 
+## (E) Test sur la Somme (80)
+
+A la différence
+
+```{r}
+## (A) LOAD DATA
+bv <- readRDS("map/bv80/mapbv.RDS") %>% st_transform(2154)
+com<-bv %>% group_by(comcode, comname) %>% summarise()
+#plot(com$geometry)
+
+
+## (B) SIMPLIFY
+listcom<-unique(bv$comcode)
+k<-length(listcom)
+
+t1<-Sys.time()
+m0<-bv_simplify(allbv=bv,mycom = listcom[1],simp = 0.01)
+for (i in 2:k){
+#  print(i)
+  m<-bv_simplify(allbv=bv,mycom = listcom[i],simp = 0.01)
+  m0<-rbind(m0,m)
+}
+t2<-Sys.time()
+paste("Temps d'execution : ",t2-t1, "Secondes")
+
+## (C) VISUALIZE
+mf_map(m0, type="typo", var="comcode",leg_pos=NA, alpha=0.2, lwd=0.4)
+mf_map(com, type="base",col=NA, border="red", lwd=1, add=T)
+mf_label(com, var="comcode",cex = 0.5,overlap = F, halo=T)
+mf_layout(paste0("Carte simplifiée"), frame=T, arrow=F, scale=T, credits=" ANR REDEC, 2026")
+```
+
