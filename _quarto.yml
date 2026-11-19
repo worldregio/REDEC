@@ -43,6 +43,8 @@ website:
             text: "Redistricting with k-means in demographic space"   
           - href: exp002.qmd  
             text: "Distribution of seats by departement for Assemblée Nationale and Senat"
+          - href: task_WPE.html
+            text: "Présentation du Work Package E (Diaporama)"
     right: 
       - icon: github # add icons as navbar buttons
         href: https://github.com/worldregio/SMA
