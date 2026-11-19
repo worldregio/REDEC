@@ -831,6 +831,7 @@ Ils sont parfois apparemment identiques mais avec des géométries différentes 
 Mais le cas le plus fréquent est un changement du nombre et de la géométrie des bureaux de vote.
 
 ![](img/cartelec_stmaur.jpg)
+
 ## Discussion
 
 **1. Impossible de faire coïncider exactement les BV de 2007 et 2022** : ce serait un exercice fastidieux et inutile tant les méthodes de reconstitution des deux dates sont imprécises.

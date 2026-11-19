@@ -753,7 +753,7 @@
     "href": "Task_WPE.html#bureaux-de-vote-de-2007-et-2022-1",
     "title": "ANR REDEC - Workpackage E",
     "section": "Bureaux de vote de 2007 et 2022",
-    "text": "Bureaux de vote de 2007 et 2022\nMais le cas le plus fréquent est un changement du nombre et de la géométrie des bureaux de vote.\n ## Discussion\n1. Impossible de faire coïncider exactement les BV de 2007 et 2022 : ce serait un exercice fastidieux et inutile tant les méthodes de reconstitution des deux dates sont imprécises.\n2. Possibilité d’analyser le redécoupage des circonscriptions législatives de 2010 à l’aide des données CARTELEC en se servant des résultats de l’élection présidentielle de 2007 et des données socio-économiques de l’INSEE qui sont fournies grâce à une intersection avec les IRIS.\n3. Création éventuelle d’une transformation des BV de 2007 en polygones de Voronoi pour harmoniser visuellement les deux bases. Mais attention au problème de fusion des communes entre 2007 et 2022\n4. Utiliser les études de cas pour évaluer la faisabilité d’une réutilisation de CARTELEC semble être la meilleure option."
+    "text": "Bureaux de vote de 2007 et 2022\nMais le cas le plus fréquent est un changement du nombre et de la géométrie des bureaux de vote."
   },
   {
     "objectID": "gerry03.html",
@@ -1090,5 +1090,12 @@
     "title": "Evolution des géométries politiques",
     "section": "Discussion",
     "text": "Discussion\n\nBureaux de vote : Il semble illusoire de mettre en correspondance les découpages des bureaux de vote établis par CARTELEC pour la période passée et ceux établis récemment par l’INSEE.\nCantons et cirsconscriptions : Il est en revanche possible de mettre en rapport les deux bases de données pour analyser l’effet des deux réformes de 2010 (révision des circonscriptions législatives) et de 2015 (modification des cantons). On pourra ainsi retrouver la manière dont les circonscriptions ont été tracés dans le cadre des anciens cantons."
+  },
+  {
+    "objectID": "Task_WPE.html#discussion-2",
+    "href": "Task_WPE.html#discussion-2",
+    "title": "ANR REDEC - Workpackage E",
+    "section": "Discussion",
+    "text": "Discussion\n1. Impossible de faire coïncider exactement les BV de 2007 et 2022 : ce serait un exercice fastidieux et inutile tant les méthodes de reconstitution des deux dates sont imprécises.\n2. Possibilité d’analyser le redécoupage des circonscriptions législatives de 2010 à l’aide des données CARTELEC en se servant des résultats de l’élection présidentielle de 2007 et des données socio-économiques de l’INSEE qui sont fournies grâce à une intersection avec les IRIS.\n3. Création éventuelle d’une transformation des BV de 2007 en polygones de Voronoi pour harmoniser visuellement les deux bases. Mais attention au problème de fusion des communes entre 2007 et 2022\n4. Utiliser les études de cas pour évaluer la faisabilité d’une réutilisation de CARTELEC semble être la meilleure option."
   }
 ]
