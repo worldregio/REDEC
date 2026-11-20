@@ -67,7 +67,7 @@ mypal<-rep(mypal,10)
 
 - **Tâche E.3** : études de cas 
 
-- **Tache E.4 (?)** : Reconstitution des géométries électorales de 2017 à l'aide de la base CARTELEC
+- **Tache E.4 (?)** : Reconstitution des géométries électorales de 2007-2010 à l'aide de la base CARTELEC
 
 
 
