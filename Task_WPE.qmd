@@ -43,7 +43,35 @@ mypal<-rep(mypal,10)
 
 # INTRODUCTION
 
-## Objectifs
+## Equipe
+
+### UMR Géographie-cités
+- Claude Grasland, PR, Département de géographie, UPC
+
+### Plateforme GEOTECA
+- Véronique Michot, MCF, Département de géographie, UPC
+- Paul Passy, MCF, Département de géographie, UPC
+- Brian Plaisant, Ingénieur, UPC
+
+### Etudiants de master
+- Waël Watanabe, Master 2 Géoprisme, UPC
+- X***, Master 2 Carthageo, UPC ou UP1 ou ENSG
+
+## Objectifs du WP. E
+
+-  **Tâche E.1.a** : Reconstitution des géométries électorales de 2022
+
+- **Tâche E.1.b** : enrichissements socio-démographique et accessibilité
+
+- **Tâche E.2** : outil de visualisation 
+
+- **Tâche E.3** : études de cas 
+
+- **Tache E.4 (?)** : Reconstitution des géométries électorales de 2017 à l'aide de la base CARTELEC
+
+
+
+## Focus sur la tâche E.1
 
 Le but de la tâche E.1 est de reconstruire la géométrie de l'ensemble des maillages politiques (communes, cantons, circonscriptions, départements) à partir de la brique de base constituée par les bureaux de votes. Plusieurs difficultés doivent être résolus :
 
@@ -67,7 +95,7 @@ Ce découpage est a priori en adéquation avec notre objectif puisqu'il est fond
 
 Il est toutefois possible de refaire les analyses à la même date ou à une date ultérieure puisque l'INSEE a également mis à disposition l'ensemble des programmes permettant d'établir le découpage en bureaux de vote sous la forme d'un package R appelé [mapvotR](https://inseefrlab.github.io/mapvotr/articles/mapvotr.html)
 
-On peut accèder au répertoire électoral unique ou [REU]() qui donne la position géographique des électeurs déduite de leur adresse.
+On peut accèder au répertoire électoral unique ou [REU](https://www.data.gouv.fr/datasets/bureaux-de-vote-et-adresses-de-leurs-electeurs) qui donne la position géographique des électeurs déduite de leur adresse.
 
 ## Agrégation des BV par circonscription
 
@@ -516,9 +544,9 @@ mf_layout(paste0(myname," (",macom,")"),
 - cela risque de prendre un temps considérable et ne peut sans doute pas être appliquée à la France entière (limiter aux quatre départements faisant l'objet de case studies ?)
 
 
-## Intérêt secondaire de la REU 
+## REU et données socio-économiques
 
-Indépendamment de la question du tracé des limites, la REU peut s'avérer très précieuse pour localiser les électeurs (accessibilité) ou opérer de croisements précis avec les données socio-économiques sur grille ou par Iris.
+La REU permet d'opérer des croisements précis avec les données socio-économiques sur grille ou par Iris.
 
 ```{r}
 macom<-94071
@@ -817,7 +845,7 @@ Il couvre théoriquement toute la France à la date de la présidentielle de 200
 
 D'après les premières expériences faites sur quelques départements, il semble possible d'agréger les fonds de carte CARTELEC par cantons ou circonscriptions. Mais au prix de corrections et vérifications. 
 
-![](docs/img/cartelec94.jpg)
+![](img/cartelec94.jpg)
 
 ## Bureaux de vote de 2007 et 2022
 

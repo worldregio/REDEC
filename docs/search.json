@@ -1097,5 +1097,33 @@
     "title": "ANR REDEC - Workpackage E",
     "section": "Discussion",
     "text": "Discussion\n1. Impossible de faire coïncider exactement les BV de 2007 et 2022 : ce serait un exercice fastidieux et inutile tant les méthodes de reconstitution des deux dates sont imprécises.\n2. Possibilité d’analyser le redécoupage des circonscriptions législatives de 2010 à l’aide des données CARTELEC en se servant des résultats de l’élection présidentielle de 2007 et des données socio-économiques de l’INSEE qui sont fournies grâce à une intersection avec les IRIS.\n3. Création éventuelle d’une transformation des BV de 2007 en polygones de Voronoi pour harmoniser visuellement les deux bases. Mais attention au problème de fusion des communes entre 2007 et 2022\n4. Utiliser les études de cas pour évaluer la faisabilité d’une réutilisation de CARTELEC semble être la meilleure option."
+  },
+  {
+    "objectID": "Task_WPE.html#equipe",
+    "href": "Task_WPE.html#equipe",
+    "title": "ANR REDEC - Workpackage E",
+    "section": "Equipe",
+    "text": "Equipe\nUMR Géographie-cités\n\nClaude Grasland, PR, Département de géographie, UPC\n\nPlateforme GEOTECA\n\nVéronique Michot, MCF, Département de géographie, UPC\nPaul Passy, MCF, Département de géographie, UPC\nBrian Plaisant, Ingénieur, UPC\n\nEtudiants de master\n\nWaël Watanabe, Master 2 Géoprisme, UPC\nX***, Master 2 Carthageo, UPC ou UP1 ou ENSG"
+  },
+  {
+    "objectID": "Task_WPE.html#objectifs-du-wp.-e",
+    "href": "Task_WPE.html#objectifs-du-wp.-e",
+    "title": "ANR REDEC - Workpackage E",
+    "section": "Objectifs du WP. E",
+    "text": "Objectifs du WP. E\n\nTâche E.1.a : Reconstitution des géométries électorales de 2022\nTâche E.1.b : enrichissements socio-démographique et accessibilité\nTâche E.2 : outil de visualisation\nTâche E.3 : études de cas\nTache E.4 (?) : Reconstitution des géométries électorales de 2017 à l’aide de la base CARTELEC"
+  },
+  {
+    "objectID": "Task_WPE.html#focus-sur-la-tâche-e.1",
+    "href": "Task_WPE.html#focus-sur-la-tâche-e.1",
+    "title": "ANR REDEC - Workpackage E",
+    "section": "Focus sur la tâche E.1",
+    "text": "Focus sur la tâche E.1\nLe but de la tâche E.1 est de reconstruire la géométrie de l’ensemble des maillages politiques (communes, cantons, circonscriptions, départements) à partir de la brique de base constituée par les bureaux de votes. Plusieurs difficultés doivent être résolus :"
+  },
+  {
+    "objectID": "Task_WPE.html#reu-et-données-socio-économiques",
+    "href": "Task_WPE.html#reu-et-données-socio-économiques",
+    "title": "ANR REDEC - Workpackage E",
+    "section": "REU et données socio-économiques",
+    "text": "REU et données socio-économiques\nLa REU permet d’opérer des croisements précis avec les données socio-économiques sur grille ou par Iris."
   }
 ]
